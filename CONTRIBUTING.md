@@ -9,7 +9,7 @@ Please note we have a code of conduct, please follow it in all your interactions
 
 1. Ensure any install or build dependencies are removed before the end of the layer when doing a 
    build.
-2. Update the docuemntation with details of changes to the functionality.
+2. Update the documentation with details of changes to the functionality.
 3. Increase the version numbers in any examples files and the README.md to the new version that this
    Pull Request would represent.
 4. The owners of this repository merge the Pull Request.
