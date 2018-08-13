@@ -56,7 +56,7 @@ The application supports both Python and Java encodings.
 ## Installation
 It doesn't request any special installation if you are planning to use only Python encodings.
 
-In case of using Java encodings, it has to be installed [javabridge](https://pypi.org/project/javabridge/) Python library. There is a constant in the code for including the Java encodings.
+In case of using Java encodings, it has to be installed [javabridge](https://pypi.org/project/javabridge/) Python library. There is a constant in the code for including the javabridge library.
 
 ## Usage
 ```
@@ -116,10 +116,10 @@ Exit codes: 0 - successful completion, 1 - completion with any error
 ```
 
 ## Contributing
-Please read [CONTRIBUTING.md](ToDO) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [CONTRIBUTING.md](https://github.com/larandvit/ebcdic-parser/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
  
 ## License
-This project is licensed under the MIT License - see the [LICENSE.md](ToDo) file for details
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/larandvit/ebcdic-parser/blob/master/LICENSE) file for details
 
 ## Acknowledgments
 Thank you, [javabridge](https://pypi.org/project/javabridge/)  team, for development and prompt support of the library
