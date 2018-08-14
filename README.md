@@ -1,24 +1,33 @@
-﻿# Mainframe EBCDIC Data Converter to ASCII
+# Mainframe EBCDIC Data Converter to ASCII
 
 ## Description
 A Python application is aimed to convert mainframe EBCDIC data into Unicode ASCII delimited text files. 
 
 The converter consists of two parts
- 1. Engine
- 2. Engine conversion rules
+1. Engine
+2. Engine conversion rules
+ 
+Conversion rules are a driver to parse EBCDIC data.
 
-The engine is smart enough to validate conversion rules and reject them if they are not compatible with the engine.
+## Features
 
-The main feature is to support major types of layouts along with fixing issues with EBCDIC file.
-
-The supported layouts are
- 1. Single schema
- 2. Multi-schema fixed record length
- 3. Multi-schema variable record length
-
-EBCDIC files can contain any kinds of anomalies and the application can address them. For example, an EBCDIC file might have a number of "garbage" characters at beginning of the file or invalid characters. 
-
-The application supports both Python and Java encodings.
+* Supported layouts
+    1. Single schema
+    2. Multi-schema fixed record length
+    3. Multi-schema variable record length
+ 
+* Fixing anomalies in EBCDIC files
+    1. Skip header
+    2. Skip footer
+    3. Remove invalid characters
+  
+* Adding relationship keys
+    1. parent-child
+    2. parent-child-grandchild
+     
+* Applicable encodings
+    1. Python
+    2. Java
 
 ## Conversion rules sample
 ```json
@@ -63,7 +72,7 @@ In case of using Java encodings, it has to be installed [javabridge](https://pyp
 usage: ebcdic_parser.py [-h] 
                         --inputfile "input file path" 
                         --outputfolder "output folder" 
-						--layoutfile "layout file"
+                        --layoutfile "layout file"
                         [--outputdelimiter [delimiter]]
                         [--outputfileextension [extension]]
                         [--ignoreconversionerrors [yes/no]]
@@ -87,30 +96,19 @@ Features
    Java functionlaity can be disabled changing JAVABRIDGEINCLUDED = True to False in Python code
 
 optional arguments:
-  -h, --help            show this help message and exit
-  --inputfile "input file path"
-                        Input EBCDIC file path
-  --outputfolder "output folder"
-                        Output folder to store delimited files
-  --layoutfile "layout file"
-                        Layout file path
-  --outputdelimiter [delimiter]
-                        output text file delimiter
-  --outputfileextension [extension]
-                        output text file extension
-  --ignoreconversionerrors [yes/no]
-                        ignore any conversion error
-  --logfolder [log folder]
-                        Output folder to store log file
-  --pythonencoding [yes/no]
-                        use Python encoding rather than Java
-  --encodingname [encoding name]
-                        Code page name to encode characters (Python or Java)
-  --grouprecords [yes/no]
-                        create relationships between records
-  --grouprecordslevel2 [yes/no]
-                        create relationships between records for level 2
-  --verbose [yes/no]    show information on screen
+  -h, --help - Show this help message and exit
+  --inputfile "input file path" - Input EBCDIC file path
+  --outputfolder "output folder" - Output folder to store delimited files
+  --layoutfile "layout file" - Layout file path
+  --outputdelimiter [delimiter] - Output text file delimiter
+  --outputfileextension [extension] - Output text file extension
+  --ignoreconversionerrors [yes/no] - Ignore any conversion error
+  --logfolder [log folder] - Output folder to store log file
+  --pythonencoding [yes/no] - Use Python encoding rather than Java
+  --encodingname [encoding name] - Code page name to encode characters (Python or Java)
+  --grouprecords [yes/no] - Create relationships between records
+  --grouprecordslevel2 [yes/no] - Create relationships between records for level 2
+  --verbose [yes/no] - Show information on screen
   
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```
@@ -123,4 +121,3 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Acknowledgments
 Thank you, [javabridge](https://pypi.org/project/javabridge/)  team, for development and prompt support of the library
-
