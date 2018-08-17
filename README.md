@@ -5,7 +5,7 @@ A Python application is aimed to convert mainframe EBCDIC data into Unicode ASCI
 
 The converter consists of two parts
 1. Engine
-2. Engine conversion rules
+2. [Engine conversion rules](https://github.com/larandvit/ebcdic-parser/blob/master/docs/engine_rules_manual.md)
  
 Conversion rules are a driver to parse EBCDIC data.
 
@@ -30,6 +30,7 @@ Conversion rules are a driver to parse EBCDIC data.
     2. Java
 
 ## Conversion rules sample
+Detailed information about conversion rules setup file can be found in [Engine Rules Manual](https://github.com/larandvit/ebcdic-parser/blob/master/docs/engine_rules_manual.md).
 ```json
 {
     "description": "conversion rules sample",
