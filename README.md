@@ -122,3 +122,6 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 
 ## Acknowledgments
 Thank you, [javabridge](https://pypi.org/project/javabridge/)  team, for development and prompt support of the library
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbLTIxMTgyNDYyOThdfQ==
+-->
