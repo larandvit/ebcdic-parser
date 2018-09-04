@@ -10,5 +10,6 @@ The document describes how to convert COBOL data type into engine rules layout.
 |DECIMAL|PIC S9(p)V9(s) COMP-3|packedDecimal|(p+s)/2+1|s|
 |DISPLAY NUMERIC|PIC S9(p)V9(s)|decimal|p+s|s|
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbLTE1NzcyMDIzNTZdfQ==
+eyJoaXN0b3J5IjpbLTE3NDY0MTA0MDAsLTE1NzcyMDIzNTZdfQ
+==
 -->
