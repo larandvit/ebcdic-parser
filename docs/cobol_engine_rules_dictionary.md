@@ -8,5 +8,5 @@ The document describes how to convert COBOL data type into engine rules layout.
 |BINARY 4 bytes|PIC S9(5) to S9(9) COMP|integer|4|N/A|
 |BINARY 8 bytes|PIC S9(10) to S9(18) COMP|-|-|-|
 |CHARACTER|PIC X(n)|string|n|N/A|
-|DECIMAL|PIC S9(p)V9(s) COMP-3|packedDecimal|(p+s)/2+1|s|
+|[DECIMAL](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_packed_decimal_type.md)|PIC S9(p)V9(s) COMP-3|packedDecimal|(p+s)/2+1|s|
 |[DISPLAY NUMERIC](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_zoned-decimal-type.md)|PIC S9(p)V9(s)|decimal, zonedDecimal|p+s|s|
