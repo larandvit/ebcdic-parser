@@ -121,7 +121,7 @@ Please read [CONTRIBUTING.md](https://github.com/larandvit/ebcdic-parser/blob/ma
 This project is licensed under the MIT License - see the [LICENSE](https://github.com/larandvit/ebcdic-parser/blob/master/LICENSE) file for details
 
 ## Acknowledgments
-Thank you, [javabridge](https://pypi.org/project/javabridge/)  team, for development and prompt support of the library
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIxMTgyNDYyOThdfQ==
--->
+* Thank you, [javabridge](https://pypi.org/project/javabridge/)  team, for development and prompt support of the library
+* https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_72/rzasd/dtdf.htm
+* http://www.mainframestechhelp.com/tutorials/cobol/
+* https://community.microfocus.com/microfocus/cobol/net_express__server_express/w/knowledge_base
