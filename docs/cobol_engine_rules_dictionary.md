@@ -11,3 +11,6 @@ The document describes how to convert COBOL data type into engine rules layout.
 |CHARACTER|PIC X(n)|string|n|N/A|N/A|
 |[DECIMAL](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_packed_decimal_type.md)|PIC S9(p)V9(s) COMP-3|packedDecimal|(p+s)/2+1|s|N/A|
 |[DISPLAY NUMERIC](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_zoned-decimal-type.md)|PIC S9(p)V9(s)|decimal, zonedDecimal|p+s|s|N/A|
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMjAzNTQ4NDY1Ml19
+-->
