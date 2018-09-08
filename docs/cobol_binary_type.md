@@ -1,6 +1,6 @@
 
 
-# COBOL Packed-Decimal Type
+# COBOL BINARY Type
 ## Storage Description
 Positive numbers are represented by 0 and negative numbers by 1 in the leftmost bit.
 
