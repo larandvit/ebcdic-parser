@@ -1,4 +1,5 @@
 # COBOL Zoned-Decimal Type
+## Storage Description
 Each byte of zoned-decimal contains one digit or one character. A storage byte is separated into 2 parts: 
 
  1. 4 bit zone
@@ -24,6 +25,15 @@ For example, -35791
 |-|-|-|-|-|
 |1111-0011|1111-0101|1111-0111|1111-1001|1101-0001|
 
-<!--stackedit_data:
-eyJoaXN0b3J5IjpbLTIwNzU5NDk0NjFdfQ==
--->
+## COBOL Representation
+### Generic format
+```
+USAGE DISPLAY SIGN [IS] {TRAILING | LEADING} [SEPARATE [CHARACTER]]
+```
+### Samples
+```
+05 VAR-ZN-DECIMAL PIC 9(5) DISPLAY.
+05 VAR-ZN-DECIMAL PIC 9(5) USAGE DISPLAY.
+05 VAR-ZN-DECIMAL PIC 9(5) USAGE DISPLAY SIGN TRAILING SEPARATE.
+05 VAR-ZN-DECIMAL PIC S9(5) DISPLAY.
+```
