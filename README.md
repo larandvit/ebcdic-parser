@@ -124,4 +124,3 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 * Thank you, [javabridge](https://pypi.org/project/javabridge/)  team, for development and prompt support of the library
 * https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_72/rzasd/dtdf.htm
 * http://www.mainframestechhelp.com/tutorials/cobol/
-* https://community.microfocus.com/microfocus/cobol/net_express__server_express/w/knowledge_base
