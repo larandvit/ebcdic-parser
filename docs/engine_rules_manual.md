@@ -120,13 +120,13 @@ Length of characters ending a record with static and variable parts. They are sk
 Name of a field.
 
 ### type
-Data type. See Layout data types section.
+[Data type](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md). See Layout data types section.
 
 ### size
-Full field size.
+Full [field size](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md).
 
 ### scale
-Size of decimals.
+[Size of decimals](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md).
 
 ## Layout Data Types
 It’s correspond to COBOL data types.
