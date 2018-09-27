@@ -30,7 +30,7 @@ Conversion rules are a driver to parse EBCDIC data.
     2. Java
 
 ## Conversion rules sample
-Detailed information about conversion rules setup file can be found in [Engine Rules Manual](https://github.com/larandvit/ebcdic-parser/blob/master/docs/engine_rules_manual.md). [COBOL Engine Rules Dictionary](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md) manual describes how to convert COBOL data types into engine rules layout.
+Detailed information about conversion rules setup file can be found in [Engine Rules](https://github.com/larandvit/ebcdic-parser/blob/master/docs/engine_rules_manual.md) manual. [COBOL Engine Rules Dictionary](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md) manual describes how to convert COBOL data types into engine rules layout.
 ```json
 {
     "description": "conversion rules sample",
