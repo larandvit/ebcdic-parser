@@ -132,10 +132,8 @@ Full [field size](https://github.com/larandvit/ebcdic-parser/blob/master/docs/co
 It’s correspond to COBOL data types.
 * packedDecimal
 * integer
-* short
 * string
 * decimal
-* zonedDecimal
 * skip – special type to skip any number of bytes. For example, there are many fillers which we don’t need and those fillers can contain "garbage"; we just ignore those fillers.
 <!--stackedit_data:
 eyJoaXN0b3J5IjpbLTYyMzkwMDE0MCwtODE3MDI1MjI1XX0=
