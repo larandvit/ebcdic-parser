@@ -89,5 +89,66 @@ class TestFunctional(unittest.TestCase):
         testResult = -5482450658163456
         self.assertEqual(parser.integer(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
     
+    def test_02_integerUnsigned(self):
+        layoutField = parser.LayoutField()
+        pythonEncoding = True
+        encodingName = parser.INPUTENCODING
+        
+        # 1 byte
+        # max value
+        testBytes = bytes(b"\xff")
+        testResult = 255
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\x00")
+        testResult = 0
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        # 59 value
+        testBytes = bytes(b"\x3b")
+        testResult = 59
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        
+        # 2 bytes
+        # max value
+        testBytes = bytes(b"\xff\xff")
+        testResult = 65535
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\x00\x00")
+        testResult = 0
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        # 27899 value
+        testBytes = bytes(b"\x6c\xfb")
+        testResult = 27899
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        
+        # 4 bytes
+        # max value
+        testBytes = bytes(b"\xff\xff\xff\xff")
+        testResult = 4294967295
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\x00\x00\x00\x00")
+        testResult = 0
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        # 35791 value
+        testBytes = bytes(b"\x00\x00\x8b\xcf")
+        testResult = 35791
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        
+        # 8 bytes
+        # max value
+        testBytes = bytes(b"\xff\xff\xff\xff\xff\xff\xff\xff")
+        testResult = 18446744073709551615
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\x00\x00\x00\x00\x00\x00\x00\x00")
+        testResult = 0
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        # 5482450658163456 value
+        testBytes = bytes(b"\x00\x13\x7a\x42\x83\xfa\x7b\x00")
+        testResult = 5482450658163456
+        self.assertEqual(parser.uinteger(testBytes, layoutField, pythonEncoding, encodingName), testResult, "Not passed: {}".format(testResult))
+        
 if __name__=="__main__":
     unittest.main()
