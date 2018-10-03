@@ -412,6 +412,11 @@ def integer(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
     
     return decodedValue
 
+def uinteger(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
+    decodedValue=int.from_bytes(fieldBytes, byteorder='big', signed=False)
+    
+    return decodedValue
+
 def short(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
     decodedValue =  integer(fieldBytes, fieldDefinition, pythonEncoding, encodingName)
     return decodedValue
