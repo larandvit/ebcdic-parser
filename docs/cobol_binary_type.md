@@ -1,6 +1,6 @@
 
 
-# COBOL BINARY Type
+# COBOL Signed BINARY Type
 ## Storage Description
 Signed integers are represented 0 in the leftmost bit for positive values and 1 for negative ones.
 
