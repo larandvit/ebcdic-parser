@@ -112,13 +112,6 @@ class Logger(object):
         #this flush method is needed for python 3 compatibility.
         pass    
 
-if JAVABRIDGEINCLUDED:
-    class JavaEncoder:
-        new_fn = javabridge.make_new("java/lang/String", "([BLjava/lang/String;)V")
-        def __init__(self, i, s):
-            self.new_fn(i, s)
-        toString = javabridge.make_method("toString", "()Ljava/lang/String;", "Retrieve the integer value")
-
 class LayoutField():
     def __init__(self):
         self.name = None
@@ -386,102 +379,120 @@ class LayoutDefinition():
             self.errorDescription = errText
          
         return not self.isError
-
-def packedDecimal(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
-    n = [ '' ]
-    for b in fieldBytes[:-1]:
-        hi, lo = divmod( b, 16 )
-        n.append(str(hi))
-        n.append(str(lo))
-    digit, sign = divmod(fieldBytes[-1], 16)
-    n.append(str(digit))
-    if sign in (0x0b, 0x0d ):
-        n[0]= '-'
-
-    buf = int(''.join(str(x) for x in n))
-    
-    if(not fieldDefinition.scale==None):
-        decodedValue = buf / (10 ** fieldDefinition.scale)
-    else:
-        decodedValue = buf
-    
-    return decodedValue
-
-def integer(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
-    decodedValue=int.from_bytes(fieldBytes, byteorder='big', signed=True)
-    
-    return decodedValue
-
-def uinteger(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
-    decodedValue=int.from_bytes(fieldBytes, byteorder='big', signed=False)
-    
-    return decodedValue
-
-def short(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
-    decodedValue =  integer(fieldBytes, fieldDefinition, pythonEncoding, encodingName)
-    return decodedValue
-
-def string(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
-    buf2 = ""
-    if(pythonEncoding):
-        ibmDecoder = codecs.getdecoder(encodingName)
-        buf = ibmDecoder(fieldBytes)
-        buf2 = buf[0]
-    else:
-        if JAVABRIDGEINCLUDED:
-            array = numpy.array(list(fieldBytes) ,numpy.uint8)
-            buf = JavaEncoder(array, encodingName)
-            buf2 = buf.toString()
-        else:
-            raise KnownIssue("Java encoding is not available as JAVABRIDGEINCLUDED=False")
-    decodedValue = controlCharRegex.sub("", buf2).strip()
-    
-    return decodedValue
-
-def decimal(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
-    buf = string(fieldBytes, fieldDefinition, pythonEncoding, encodingName)
-    if(buf==""):
-        buf = "0"
-    decodedValue = int(buf)
-    if(not fieldDefinition.scale==None):
-        decodedValue = decodedValue / (10 ** fieldDefinition.scale)
-    
-    return decodedValue;
-
-def zonedDecimal(fieldBytes, fieldDefinition, pythonEncoding, encodingName):
-    buf = string(fieldBytes, fieldDefinition, pythonEncoding, encodingName)
-    if(buf==""):
-        buf = "0"
-    decodedValue = int(buf)
-    if(not fieldDefinition.scale==None):
-        decodedValue = decodedValue / (10 ** fieldDefinition.scale)
-    
-    return decodedValue;
-
-def convertFunction(fieldType):
-    convert=None
         
-    if(fieldType=="packedDecimal"):
-        convert=packedDecimal
-    elif(fieldType=="integer"):
-        convert=integer
-    elif(fieldType=="short"):
-        convert=short
-    elif(fieldType=="string"):
-        convert=string
-    elif(fieldType=="decimal"):
-        convert=decimal
-    elif(fieldType=="zonedDecimal"):
-        convert=zonedDecimal
+class DataConverter():
+    def __init__(self, pythonEncoding, encodingName):
+        self.pythonEncoding = pythonEncoding
+        self.encodingName = encodingName
+        
+        self.controlCharRegex = self.buildControlCharRegex()
+        
+        if(not self.pythonEncoding):
+            if JAVABRIDGEINCLUDED:
+                javabridge.start_vm(run_headless=True)
+    
+    def packedDecimal(self, fieldBytes, fieldDefinition):
+        n = [ '' ]
+        for b in fieldBytes[:-1]:
+            hi, lo = divmod( b, 16 )
+            n.append(str(hi))
+            n.append(str(lo))
+        digit, sign = divmod(fieldBytes[-1], 16)
+        n.append(str(digit))
+        if sign in (0x0b, 0x0d ):
+            n[0]= '-'
+    
+        buf = int(''.join(str(x) for x in n))
+        
+        if(not fieldDefinition.scale==None):
+            decodedValue = buf / (10 ** fieldDefinition.scale)
+        else:
+            decodedValue = buf
+        
+        return decodedValue
+    
+    def integer(self, fieldBytes, fieldDefinition):
+        decodedValue=int.from_bytes(fieldBytes, byteorder='big', signed=True)
+        
+        return decodedValue
+    
+    def uinteger(self, fieldBytes, fieldDefinition):
+        decodedValue=int.from_bytes(fieldBytes, byteorder='big', signed=False)
+        
+        return decodedValue
+    
+    def string(self, fieldBytes, fieldDefinition):
+        buf2 = ""
+        if(self.pythonEncoding):
+            ibmDecoder = codecs.getdecoder(self.encodingName)
+            buf = ibmDecoder(fieldBytes)
+            buf2 = buf[0]
+        else:
+            if JAVABRIDGEINCLUDED:
+                class JavaEncoder():
+                    new_fn = javabridge.make_new("java/lang/String", "([BLjava/lang/String;)V")
+                    def __init__(self, i, s):
+                        self.new_fn(i, s)
+                    toString = javabridge.make_method("toString", "()Ljava/lang/String;", "Retrieve the integer value")
+                array = numpy.array(list(fieldBytes) ,numpy.uint8)
+                buf = JavaEncoder(array, self.encodingName)
+                buf2 = buf.toString()
+            else:
+                raise KnownIssue("Java encoding is not available as JAVABRIDGEINCLUDED=False")
+        decodedValue = self.controlCharRegex.sub("", buf2).strip()
+        
+        return decodedValue
+    
+    def decimal(self, fieldBytes, fieldDefinition):
+        buf = self.string(fieldBytes, fieldDefinition)
+        if(buf==""):
+            buf = "0"
+        decodedValue = int(buf)
+        if(not fieldDefinition.scale==None):
+            decodedValue = decodedValue / (10 ** fieldDefinition.scale)
+        
+        return decodedValue;
+    
+    def convert(self, fieldBytes, fieldDefinition):
+        
+        fieldType = fieldDefinition.type
+        convert=None
+            
+        if(fieldType=="packedDecimal"):
+            convert=self.packedDecimal
+        elif(fieldType=="integer"):
+            convert=self.integer
+        elif(fieldType=="short"):
+            convert=self.integer
+        elif(fieldType=="string"):
+            convert=self.string
+        elif(fieldType=="decimal"):
+            convert=self.decimal
+        elif(fieldType=="zonedDecimal"):
+            convert=self.decimal
 
-    return convert
-
+        return convert(fieldBytes, fieldDefinition)
+        
+    
+    def buildControlCharRegex(self):
+        # create a list of control (unreadable/invisible) characters
+        allChars = (chr(i) for i in range(sys.maxunicode))
+        controlChars = ''.join(c for c in allChars if unicodedata.category(c) == 'Cc')
+        return re.compile('[%s]' % re.escape(controlChars))
+    
+    def release(self):
+        if(not self.pythonEncoding):
+            if JAVABRIDGEINCLUDED:
+                javabridge.kill_vm()
+        
 def convert_error_message(recordLayoutType, field, fieldBytes, catchedError):
     return "Conversation error\t" + "Layout type: " + recordLayoutType + "\t" + str(field.name) + "\t" + str(fieldBytes) + "\t" + str(catchedError)
 
 if __name__=="__main__":
 
     returnCode = 1
+    
+    dataConverter = None
     
     # store references to open output files. Keys as file names
     outputOpenFiles = {}
@@ -567,7 +578,10 @@ if __name__=="__main__":
         print("Group records level 2: ", "yes" if GROUPRECORDSLEVEL2 else "no")
         print("Show information on screen:", args.verbose)
         
-        # layout definitions and other suppelemental info
+        # conversion engine class
+        dataConverter = DataConverter(PYTHONENCODING, INPUTENCODING)
+        
+        # layout definitions and other supplemental info
         layoutDefinition = LayoutDefinition()
     
         if not layoutDefinition.loadLayouts(layoutPath):
@@ -585,11 +599,6 @@ if __name__=="__main__":
         
         # store record count for each output file
         recordCount = {}
-        
-        # create a list of control (unreadable/invisible) characters
-        allChars = (chr(i) for i in range(sys.maxunicode))
-        controlChars = ''.join(c for c in allChars if unicodedata.category(c) == 'Cc')
-        controlCharRegex = re.compile('[%s]' % re.escape(controlChars))
             
         with codecs.open(filePath, "rb") as f_in:
             
@@ -641,11 +650,7 @@ if __name__=="__main__":
                 #convert key values
                 for keyField in layoutDefinition.keyFields:
                     if keyField.type!=SKIPFIELDTYPENAME:
-                        convert = convertFunction(keyField.type)
-                        if(convert == None):
-                            raise KnownIssue("Error in record layout type: " + "Layout type - unknown" + " Field name: " + keyField.name + "Field type - " + str(keyField.type))
-                        else:
-                            keyField.convertedValue = convert(keyField.rawValue, keyField, PYTHONENCODING, INPUTENCODING)           
+                        keyField.convertedValue = dataConverter.convert(keyField.rawValue, keyField)           
     
                 # check if record type in layouts and extract layout
                 isFoundLayout = False
@@ -701,7 +706,7 @@ if __name__=="__main__":
                 record = None
                 if(layoutDefinition.isMultipleLayouts):
                     if(foundLayout.isVariableFields and layoutDefinition.isKeyLayoutSize):
-                        #this is Walmart EDI extraction logic
+                        # this is special multi-schema extraction logic
                         recordSize = layoutDefinition.keyLayoutSize.convertedValue - layoutDefinition.keyLayoutSize.size - layoutDefinition.keyLayoutType.size + foundLayout.terminatorSize
                         record = f_in.read(recordSize)
                         NumberOfRecordsRead += recordSize
@@ -734,24 +739,20 @@ if __name__=="__main__":
                     
                     # don't extract field value if field type is "skip"
                     if(fieldType!=SKIPFIELDTYPENAME):
-                        convert = convertFunction(fieldType)
-                        if(convert == None):
-                            raise KnownIssue("Error in field\t" + "Layout type - " + foundLayout.layoutType + "\t" + str(field))
-                        else:
-                            try: 
-                                recordBuf = recordBuf + delimiter + str(convert(record[fieldStart:fieldEnd], field, PYTHONENCODING, INPUTENCODING))
-                            except UnicodeEncodeError as ex:
-                                if(IGNORECONVERSIONERRORS):
-                                    print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
-                                    recordBuf = recordBuf + delimiter
-                                else:
-                                    raise KnownIssue(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
-                            except:
-                                if(IGNORECONVERSIONERRORS):
-                                    print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], str(sys.exc_info()[0]) + " " + str(sys.exc_info()[1])))
-                                    recordBuf = recordBuf + delimiter
-                                else:
-                                    raise KnownIssue(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], str(sys.exc_info()[0]) + " " + str(sys.exc_info()[1])))
+                        try: 
+                            recordBuf = recordBuf + delimiter + str(dataConverter.convert(record[fieldStart:fieldEnd], field))
+                        except UnicodeEncodeError as ex:
+                            if(IGNORECONVERSIONERRORS):
+                                print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
+                                recordBuf = recordBuf + delimiter
+                            else:
+                                raise KnownIssue(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
+                        except:
+                            if(IGNORECONVERSIONERRORS):
+                                print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], str(sys.exc_info()[0]) + " " + str(sys.exc_info()[1])))
+                                recordBuf = recordBuf + delimiter
+                            else:
+                                raise KnownIssue(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], str(sys.exc_info()[0]) + " " + str(sys.exc_info()[1])))
                                 
                     currentRecordPosition += fieldSize
                             
@@ -800,8 +801,7 @@ if __name__=="__main__":
                     fieldSize = field.size
                     fieldStart = field.start
                     fieldEnd= fieldStart + fieldSize
-                    convert = convertFunction(fieldType)        
-                    numberDymanicRecords = convert(record[fieldStart:fieldEnd], field, PYTHONENCODING, INPUTENCODING)
+                    numberDymanicRecords = dataConverter.convert(record[fieldStart:fieldEnd], field)
     
                     for i in range(0, int(numberDymanicRecords)):
                                 
@@ -819,24 +819,20 @@ if __name__=="__main__":
                             if(fieldType==SKIPFIELDTYPENAME):
                                 recordVariableBuf = recordVariableBuf + delimiter
                             else:
-                                convert = convertFunction(fieldType)
-                                if(convert == None):
-                                    raise KnownIssue("Error in field\t" + "Layout type: " + foundLayout.layoutType + "\t" + "Field name: " + fieldName + "\t" + "Field type - " + str(fieldType))
-                                else:
-                                    try: 
-                                        recordVariableBuf = recordVariableBuf + delimiter + str(convert(record[fieldStart:fieldEnd], field, PYTHONENCODING, INPUTENCODING))
-                                    except UnicodeEncodeError as ex:
-                                        if(IGNORECONVERSIONERRORS):
-                                            print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
-                                            recordVariableBuf = recordVariableBuf + delimiter
-                                        else:
-                                            raise KnownIssue(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
-                                    except:
-                                        if(IGNORECONVERSIONERRORS):
-                                            print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], sys.exc_info()[0]))
-                                            recordVariableBuf = recordVariableBuf + delimiter
-                                        else:
-                                            raise KnownIssue(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], sys.exc_info()[0]))
+                                try: 
+                                    recordVariableBuf = recordVariableBuf + delimiter + str(dataConverter.convert(record[fieldStart:fieldEnd], field))
+                                except UnicodeEncodeError as ex:
+                                    if(IGNORECONVERSIONERRORS):
+                                        print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
+                                        recordVariableBuf = recordVariableBuf + delimiter
+                                    else:
+                                        raise KnownIssue(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
+                                except:
+                                    if(IGNORECONVERSIONERRORS):
+                                        print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], sys.exc_info()[0]))
+                                        recordVariableBuf = recordVariableBuf + delimiter
+                                    else:
+                                        raise KnownIssue(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], sys.exc_info()[0]))
                                         
                             delimiter = DELIMITER
     
@@ -922,9 +918,9 @@ if __name__=="__main__":
         
         if(not wrongArgumentsFlag):
             print("Completed:", datetime.datetime.now())
-            
-        if(not PYTHONENCODING):
-            if JAVABRIDGEINCLUDED:
-                javabridge.kill_vm()
+        
+        # destroy conversion engine. There are resource which have to be released
+        if dataConverter!=None:
+            dataConverter.release()
                 
         sys.exit(returnCode)
