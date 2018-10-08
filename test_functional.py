@@ -208,7 +208,8 @@ class TestFunctional(unittest.TestCase):
         self.assertEqual(dataConverter.string(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
         
         # Chinese "Hello everybody!" text
-        testBytes = bytes(b"\x0e\x4a\xf2\x0f\x0e\x4e\xd1\x0f\x0e\x4d\xc2\x0f\x5a")
+        testBytes = bytes(b"\x0e\x4a\xf2\x4e\xd1\x4d\xc2\x0f\x5a")
+        # testBytes = bytes(b"\x0e\x4a\xf2\x0f\x0e\x4e\xd1\x0f\x0e\x4d\xc2\x0f\x5a")
         testResult = "大家好!"
         self.assertEqual(dataConverter.string(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
         
