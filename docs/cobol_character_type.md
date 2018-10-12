@@ -1,7 +1,7 @@
 # COBOL CHARACTER Type
 
 ## Storage Description
-The character data type represents characters converted from a source coding to the output one. The output coding is utf-8.
+The character data type represents characters converted from a source coding to the output one. The output coding is utf-8. utf-8 coding supports up to 4 bytes characters.
 
 **[ibm037 coding](https://github.com/larandvit/ebcdic-parser/blob/master/docs/ibm037_charset.md)**
 
@@ -23,9 +23,9 @@ English characters
 
 Hello everybody! in Chinese
 
-|Converted to uft-8 bytes|Special byte to indicate start of 2 byte code|大|家|好|Special byte to indicate finish of 2 byte code|!|
+|Converted to uft-8 bytes|Special byte to mark the beginning of a sequence of multi-byte codes|大|家|好|Special byte to mark the end of a sequence of multi-byte codes|!|
 |-|-|-|-|-|-|-|
-|HEX ibm037 bytes|0e|4af2|4ed1|4dc2|0f|5a|
+|hex ibm037 bytes|0e|4af2|4ed1|4dc2|0f|5a|
 
 ## COBOL Representation
 ### Samples
