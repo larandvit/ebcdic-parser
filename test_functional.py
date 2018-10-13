@@ -215,5 +215,83 @@ class TestFunctional(unittest.TestCase):
         
         dataConverter.release()
         
+    def test_05_packedDecimal(self):
+        layoutField = parser.LayoutField()
+        layoutField.size = 1
+        layoutField.scale = 0
+        pythonEncoding = True
+        encodingName = parser.INPUTENCODING
+        
+        dataConverter = parser.DataConverter(pythonEncoding, encodingName)
+                
+        # 1 byte
+        # max value
+        testBytes = bytes(b"\xff")
+        testResult = 15
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\xfd")
+        testResult = -15
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 59 value
+        testBytes = bytes(b"\x6f")
+        testResult = 6
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # -59 value
+        testBytes = bytes(b"\x6d")
+        testResult = -6
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # max value divided by 10
+        layoutField.scale = 1
+        testBytes = bytes(b"\xff")
+        testResult = 1.5
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # min value divided by 10
+        testBytes = bytes(b"\xfd")
+        testResult = -1.5
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        
+        # 2 bytes
+        layoutField.scale = 0
+        # max value
+        testBytes = bytes(b"\xff\xff")
+        testResult = 151515
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\xff\xfd")
+        testResult = -151515
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 899 value
+        testBytes = bytes(b"\x89\x9f")
+        testResult = 899
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 899 value divided by 1000
+        layoutField.scale = 3
+        testBytes = bytes(b"\x89\x9f")
+        testResult = 0.899
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        
+        # 4 bytes
+        layoutField.scale = 0
+        # max value
+        testBytes = bytes(b"\xff\xff\xff\xff")
+        testResult = 15151515151515
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\x00\x00\x00\x00")
+        testResult = 0
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 35791 value
+        testBytes = bytes(b"\x00\x35\x79\x1f")
+        testResult = 35791
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 35791 value divided by 10
+        layoutField.scale = 2
+        testBytes = bytes(b"\x00\x35\x79\x1f")
+        testResult = 357.91
+        self.assertEqual(dataConverter.packedDecimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        
+        dataConverter.release()
+        
 if __name__=="__main__":
     unittest.main()
