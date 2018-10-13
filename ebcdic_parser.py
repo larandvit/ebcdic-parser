@@ -399,7 +399,7 @@ class DataConverter():
             n.append(str(lo))
         digit, sign = divmod(fieldBytes[-1], 16)
         n.append(str(digit))
-        if sign in (0x0b, 0x0d ):
+        if sign==0x0d:
             n[0]= '-'
     
         buf = int(''.join(str(x) for x in n))
