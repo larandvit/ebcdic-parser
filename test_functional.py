@@ -293,5 +293,91 @@ class TestFunctional(unittest.TestCase):
         
         dataConverter.release()
         
+    def test_06_decimal(self):
+        layoutField = parser.LayoutField()
+        layoutField.size = 1
+        layoutField.scale = 0
+        pythonEncoding = True
+        encodingName = parser.INPUTENCODING
+        
+        dataConverter = parser.DataConverter(pythonEncoding, encodingName)
+                
+        # 1 byte
+        # max value
+        testBytes = bytes(b"\xf9")
+        testResult = 9
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\xd9")
+        testResult = -9
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 6 value
+        testBytes = bytes(b"\xf6")
+        testResult = 6
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # -6 value
+        testBytes = bytes(b"\xd6")
+        testResult = -6
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 0 value
+        testBytes = bytes(b"\xf0")
+        testResult = 0
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # max value divided by 10
+        layoutField.scale = 1
+        testBytes = bytes(b"\xf9")
+        testResult = 0.9
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # min value divided by 10
+        testBytes = bytes(b"\xd9")
+        testResult = -0.9
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        
+        # 2 bytes
+        layoutField.scale = 0
+        # max value
+        testBytes = bytes(b"\xf9\xf9")
+        testResult = 99
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\xf9\xd9")
+        testResult = -99
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 0 value
+        testBytes = bytes(b"\xf0\xf0")
+        testResult = 0
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 81 value divided by 1000
+        layoutField.scale = 3
+        testBytes = bytes(b"\xf8\xf1")
+        testResult = 0.081
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+         
+        # 4 bytes
+        layoutField.scale = 0
+        # max value
+        testBytes = bytes(b"\xf9\xf9\xf9\xf9")
+        testResult = 9999
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # min value
+        testBytes = bytes(b"\xf9\xf9\xf9\xd9")
+        testResult = -9999
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 0 value
+        testBytes = bytes(b"\x00\x00\x00\x00")
+        testResult = 0
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 35791 value
+        testBytes = bytes(b"\xf6\xf7\xf8\xf9")
+        testResult = 6789
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        # 35791 value divided by 10
+        layoutField.scale = 2
+        testBytes = bytes(b"\xf5\xf7\xf9\xf1")
+        testResult = 57.91
+        self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
+        
+        dataConverter.release()
+        
 if __name__=="__main__":
     unittest.main()
