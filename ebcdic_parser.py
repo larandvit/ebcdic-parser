@@ -9,7 +9,6 @@ Description:
                 
             Parameters/Exit code: run application with option -h or --help. There are a set of mandatory and a set of optional parameters
 """
-from Demos.BackupRead_BackupWrite import buf
 
 # this is a way to exclude javabridge functionality. The funnctionality is requested by Java encoding.
 # If it needs to run the application without installing javabridge library. Java encoding is not available in that case
@@ -38,10 +37,10 @@ import unicodedata
 __author__ = "Vitaly Saversky"
 __date__ = "2017-10-04"
 __credits__ = ["Vitaly Saversky"]
-__version__ = "2.1.1"
+__version__ = "2.1.2"
 __maintainer__ = "Vitaly Saversky"
 __email__ = "larandvit@hotmail.com"
-__status__ = "Development"
+__status__ = "Production"
 
 class FileFormat(IntEnum):
     SingleSchema = 1
@@ -400,7 +399,7 @@ class DataConverter():
             n.append(str(lo))
         digit, sign = divmod(fieldBytes[-1], 16)
         n.append(str(digit))
-        if sign!=0x0f:
+        if sign==0x0d:
             n[0]= '-'
     
         buf = int(''.join(str(x) for x in n))
