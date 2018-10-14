@@ -369,7 +369,7 @@ class TestFunctional(unittest.TestCase):
         self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
         # 35791 value
         testBytes = bytes(b"\xf6\xf7\xf8\xf9")
-        testResult = 6789
+        testResult = 6789 
         self.assertEqual(dataConverter.decimal(testBytes, layoutField), testResult, "Not passed: {}".format(testResult))
         # 35791 value divided by 10
         layoutField.scale = 2
