@@ -9,6 +9,7 @@ Description:
                 
             Parameters/Exit code: run application with option -h or --help. There are a set of mandatory and a set of optional parameters
 """
+from Demos.BackupRead_BackupWrite import buf
 
 # this is a way to exclude javabridge functionality. The funnctionality is requested by Java encoding.
 # If it needs to run the application without installing javabridge library. Java encoding is not available in that case
@@ -399,7 +400,7 @@ class DataConverter():
             n.append(str(lo))
         digit, sign = divmod(fieldBytes[-1], 16)
         n.append(str(digit))
-        if sign==0x0d:
+        if sign!=0x0f:
             n[0]= '-'
     
         buf = int(''.join(str(x) for x in n))
@@ -444,12 +445,28 @@ class DataConverter():
         return decodedValue
     
     def decimal(self, fieldBytes, fieldDefinition):
-        buf = self.string(fieldBytes, fieldDefinition)
-        if(buf==""):
-            buf = "0"
-        decodedValue = int(buf)
-        if(not fieldDefinition.scale==None):
-            decodedValue = decodedValue / (10 ** fieldDefinition.scale)
+        
+        decodedValue = 0
+        sign_value =""
+        
+        if len(fieldBytes) != 0:
+            #find if sign provided
+            sign, digit = divmod(fieldBytes[-1], 16)
+            
+            if sign!=0x0f:
+                fieldBytes = fieldBytes[:-1] + (0xf0 | digit).to_bytes(1, 'little')
+                sign_value = "-"
+                
+            buf = self.string(fieldBytes, fieldDefinition)
+
+            if(buf==""):
+                buf = "0"
+            else:
+                buf = sign_value + buf
+                
+            decodedValue = int(buf)
+            if(not fieldDefinition.scale==None):
+                decodedValue = decodedValue / (10 ** fieldDefinition.scale)
         
         return decodedValue;
     
