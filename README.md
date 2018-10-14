@@ -114,6 +114,14 @@ optional arguments:
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```
 
+## Unit test
+### Functional tests
+
+Those tests cover testing of each data type. 
+```
+test_functional.py
+```
+
 ## Contributing
 Please read [CONTRIBUTING.md](https://github.com/larandvit/ebcdic-parser/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
  
@@ -124,3 +132,4 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 * Thank you, [javabridge](https://pypi.org/project/javabridge/)  team, for development and prompt support of the library
 * https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_72/rzasd/dtdf.htm
 * http://www.mainframestechhelp.com/tutorials/cobol/
+* http://www.fileformat.info/
