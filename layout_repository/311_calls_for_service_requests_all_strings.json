@@ -1,0 +1,27 @@
+{
+	"description": "311 calls for service requests with all fileds as strings",
+	"layouts": [
+		{
+			"layouttype": "main",
+			"layout": [
+				{"name":"service_request_id","type": "string","size":12},
+				{"name":"status","type": "string","size":6},
+				{"name":"status_notes","type": "string","size":126},
+				{"name":"service_name","type": "string","size":30},
+				{"name":"service_code","type": "string","size":10},
+				{"name":"description","type": "string","size":344},
+				{"name":"agency_responsible","type": "string","size":11},
+				{"name":"service_notice","type": "string","size":1},
+				{"name":"requested_datetime","type": "string","size":25},
+				{"name":"updated_datetime","type": "string","size":25},
+				{"name":"expected_datetime","type": "string","size":25},
+				{"name":"address","type": "string","size":130},
+				{"name":"address_id","type": "string","size":8},
+				{"name":"zipcode","type": "string","size":6},
+				{"name":"long","type": "string","size":14},
+				{"name":"lat","type": "string","size":14},
+				{"name":"media_url","type": "string","size":118}
+			]
+		}
+	]
+}

@@ -114,12 +114,22 @@ optional arguments:
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```
 
-## Unit test
+## Testing
 ### Functional tests
 
 Those tests cover testing of each data type. 
 ```
 test_functional.py
+```
+## System tests
+The tests are needed to test entire functionality for each feature.
+* Tool to create samples
+```
+converter_to_ebcdic.py
+```
+* Run tests
+```
+test_system_311_calls_for_service_requests_all_strings.py
 ```
 
 ## Contributing
