@@ -12,7 +12,7 @@ Description:
 
 # this is a way to exclude javabridge functionality. The funnctionality is requested by Java encoding.
 # If it needs to run the application without installing javabridge library. Java encoding is not available in that case
-JAVABRIDGEINCLUDED = True
+JAVABRIDGEINCLUDED = False
 
 import os.path as path
 import os
