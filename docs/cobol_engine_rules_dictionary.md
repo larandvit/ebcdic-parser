@@ -14,7 +14,9 @@ The document describes how to convert COBOL data type into engine rules layout.
 |[Unsigned BINARY 8 bytes](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_binary_type_unsigned.md)|PIC 9(11) to 9(20) COMP|uinteger|8|N/A|0 to 18446744073709551615|
 |[FLOAT 4 bytes](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_float_type.md)|PIC S9(p)V9(s) COMP-1|Not supported|-|-|-3.4028235E+38 to -1.1754944E-38, 0.0E+0, +1.1754944E-38 to +3.4028235E+38|
 |[FLOAT 8 bytes](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_float_type.md)|PIC S9(p)V9(s) COMP-2|Not supported|-|-|-1.797693134862315E+308 to -2.225073858507201E-308, 0.0E+0, +2.225073858507201E-308 to +1.797693134862315E+308|
-|[CHARACTER](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_character_type.md)|PIC X(n)|string|n|N/A|N/A|
+|Alpha [CHARACTER](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_character_type.md) (A-Z, a-z, and space)|PIC A(n)|string|n|N/A|N/A|
+|Any [CHARACTER](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_character_type.md)|PIC X(n)|string|n|N/A|N/A|
+|Numeric [CHARACTER](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_character_type.md) (numbers 0-9)|PIC X(n)|string|n|N/A|N/A|
 |[DECIMAL](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_packed_decimal_type.md)|PIC S9(p)V9(s) COMP-3|packedDecimal|(p+s)/2+1|s|N/A|
 |[DISPLAY NUMERIC](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_zoned-decimal-type.md)|PIC S9(p)V9(s)|decimal, zonedDecimal|p+s|s|N/A|
 

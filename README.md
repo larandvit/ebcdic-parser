@@ -144,3 +144,4 @@ This project is licensed under the MIT License - see the [LICENSE](https://githu
 * http://www.mainframestechhelp.com/tutorials/cobol/
 * http://www.fileformat.info/
 * [City Toronto Open Data](https://www.toronto.ca/city-government/data-research-maps/open-data/)
+* [Reading COBOL Layouts](http://www.3480-3590-data-conversion.com/article-reading-cobol-layouts-1.html)
