@@ -16,7 +16,7 @@ The document describes how to convert COBOL data type into engine rules layout.
 |[FLOAT 8 bytes](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_float_type.md)|PIC S9(p)V9(s) COMP-2|Not supported|-|-|-1.797693134862315E+308 to -2.225073858507201E-308, 0.0E+0, +2.225073858507201E-308 to +1.797693134862315E+308|
 |Alpha [CHARACTER](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_character_type.md) (A-Z, a-z, and space)|PIC A(n)|string|n|N/A|N/A|
 |Any [CHARACTER](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_character_type.md)|PIC X(n)|string|n|N/A|N/A|
-|Numeric [CHARACTER](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_character_type.md) (numbers 0-9)|PIC X(n)|string|n|N/A|N/A|
+|Numeric [CHARACTER](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_character_type.md) (numbers 0-9)|PIC 9(n)|string|n|N/A|N/A|
 |[DECIMAL](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_packed_decimal_type.md)|PIC S9(p)V9(s) COMP-3|packedDecimal|(p+s)/2+1|s|N/A|
 |[DISPLAY NUMERIC](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_zoned-decimal-type.md)|PIC S9(p)V9(s)|decimal, zonedDecimal|p+s|s|N/A|
 
