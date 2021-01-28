@@ -114,6 +114,16 @@ optional arguments:
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```
 
+## Samples
+### Single schema
+
+```bash
+ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "./test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "./layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter , --ignoreconversionerrors no --pythonencoding yes --grouprecords no --verbose yes
+```
+
+Output location: ./test_data/311_calls_for_service_requests_all_strings/output
+Log file: ./ebcdic_parser.log
+
 ## Testing
 ### Functional tests
 
