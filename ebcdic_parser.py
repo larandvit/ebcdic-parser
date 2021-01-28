@@ -575,8 +575,6 @@ if __name__=="__main__":
         fileFolder = path.dirname(filePath)
         fileName, fileExtension  = path.splitext(path.basename(filePath))
         
-        print("")
-        print("Processing file...", fileName + fileExtension)
         print("Application version:", __version__)
         print("Stated:", datetime.datetime.now())
         print("Parameters:")
@@ -606,6 +604,8 @@ if __name__=="__main__":
         print("Format:", "(" + str(layoutDefinition.fileFormat) + ")", FILEFORMATS[layoutDefinition.fileFormat])
         
         print("-----------------------------------")
+        print()
+        print("Processing file...", fileName + fileExtension)
         
         if(not PYTHONENCODING):
             if JAVABRIDGEINCLUDED:
@@ -898,7 +898,7 @@ if __name__=="__main__":
                     recordSizeBytes = f_in.read(layoutSize)
                     NumberOfRecordsRead += layoutSize
                 
-        print("Processed data:", fileName + fileExtension)            
+        print()            
         keys = sorted(recordCount.keys())
         for key in keys:
             print(str(key) + ": " +  str(recordCount[key]))
