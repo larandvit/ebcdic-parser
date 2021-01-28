@@ -28,6 +28,8 @@ Conversion rules are a driver to parse EBCDIC data.
 * Applicable encodings
     1. Python
     2. Java
+    
+* Debug mode to troubleshoot layouts
 
 ## Conversion rules sample
 Detailed information about conversion rules setup file can be found in [Engine Rules](https://github.com/larandvit/ebcdic-parser/blob/master/docs/engine_rules_manual.md) manual. [COBOL Engine Rules Dictionary](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md) manual describes how to convert COBOL data types into engine rules layout.
@@ -70,21 +72,18 @@ In case of using Java encodings, it has to be installed [javabridge](https://pyp
 
 ## Usage
 ```
-usage: ebcdic_parser.py [-h] 
-                        --inputfile "input file path" 
-                        --outputfolder "output folder" 
-                        --layoutfile "layout file"
+usage: ebcdic_parser.py [-h] --inputfile "input file path" --outputfolder
+                        "output folder" --layoutfile "layout file"
                         [--outputdelimiter [delimiter]]
                         [--outputfileextension [extension]]
                         [--ignoreconversionerrors [yes/no]]
-                        [--logfolder [log folder]]
-                        [--pythonencoding [yes/no]]
+                        [--logfolder [log folder]] [--pythonencoding [yes/no]]
                         [--encodingname [encoding name]]
                         [--grouprecords [yes/no]]
-                        [--grouprecordslevel2 [yes/no]]
-                        [--verbose [yes/no]]
+                        [--grouprecordslevel2 [yes/no]] [--verbose [yes/no]]
+                        [--debug [yes/no]]
 
-Convert mainframe EBCDIC data to delimited text format. Version 2.1.0
+Convert EBCDIC data into delimited text format. Version 2.3.0
 
 Supported file formats:
 (1) Single schema
@@ -97,20 +96,32 @@ Features
    Java functionlaity can be disabled changing JAVABRIDGEINCLUDED = True to False in Python code
 
 optional arguments:
-  -h, --help - Show this help message and exit
-  --inputfile "input file path" - Input EBCDIC file path
-  --outputfolder "output folder" - Output folder to store delimited files
-  --layoutfile "layout file" - Layout file path
-  --outputdelimiter [delimiter] - Output text file delimiter
-  --outputfileextension [extension] - Output text file extension
-  --ignoreconversionerrors [yes/no] - Ignore any conversion error
-  --logfolder [log folder] - Output folder to store log file
-  --pythonencoding [yes/no] - Use Python encoding rather than Java
-  --encodingname [encoding name] - Code page name to encode characters (Python or Java)
-  --grouprecords [yes/no] - Create relationships between records
-  --grouprecordslevel2 [yes/no] - Create relationships between records for level 2
-  --verbose [yes/no] - Show information on screen
-  
+  -h, --help            show this help message and exit
+  --inputfile "input file path"
+                        Input EBCDIC file path
+  --outputfolder "output folder"
+                        Output folder to store delimited files
+  --layoutfile "layout file"
+                        Layout file path
+  --outputdelimiter [delimiter]
+                        output text file delimiter
+  --outputfileextension [extension]
+                        output text file extension
+  --ignoreconversionerrors [yes/no]
+                        ignore any conversion error
+  --logfolder [log folder]
+                        Output folder to store log file
+  --pythonencoding [yes/no]
+                        use Python encoding rather than Java
+  --encodingname [encoding name]
+                        Code page name to encode characters (Python or Java)
+  --grouprecords [yes/no]
+                        create relationships between records
+  --grouprecordslevel2 [yes/no]
+                        create relationships between records for level 2
+  --verbose [yes/no]    show information on screen
+  --debug [yes/no]      show debug information
+
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```
 
@@ -118,7 +129,16 @@ Exit codes: 0 - successful completion, 1 - completion with any error
 ### Single schema
 
 ```bash
-ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "./test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "./layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter , --ignoreconversionerrors no --pythonencoding yes --grouprecords no --verbose yes
+ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "./test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "./layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter ,
+```
+
+* Output location: ./test_data/311_calls_for_service_requests_all_strings/output
+* Log file: ./ebcdic_parser.log
+
+### Single schema in debug mode
+
+```bash
+ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "./test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "./layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter , --debug yes
 ```
 
 * Output location: ./test_data/311_calls_for_service_requests_all_strings/output

@@ -37,7 +37,7 @@ import unicodedata
 __author__ = "Vitaly Saversky"
 __date__ = "2017-10-04"
 __credits__ = ["Vitaly Saversky"]
-__version__ = "2.1.2"
+__version__ = "2.3.0"
 __maintainer__ = "Vitaly Saversky"
 __email__ = "larandvit@hotmail.com"
 __status__ = "Production"
@@ -58,6 +58,7 @@ IGNORECONVERSIONERRORS = False
 VERBOSE = True
 GROUPRECORDS = False
 GROUPRECORDSLEVEL2 = False
+DEBUG_MODE = False
 
 PYTHONENCODING = True
 INPUTENCODING = "cp037"
@@ -548,6 +549,7 @@ if __name__=="__main__":
         parser.add_argument("--grouprecords", nargs="?", default="yes" if GROUPRECORDS else "no", choices=["yes","no"], help="create relationships between records", metavar='yes/no')
         parser.add_argument("--grouprecordslevel2", nargs="?", default="yes" if GROUPRECORDSLEVEL2 else "no", choices=["yes","no"], help="create relationships between records for level 2", metavar='yes/no')
         parser.add_argument("--verbose", nargs="?", default="yes" if VERBOSE else "no", choices=["yes","no"], help="show information on screen", metavar='yes/no')
+        parser.add_argument("--debug", nargs="?", default="yes" if DEBUG_MODE else "no", choices=["yes","no"], help="show debug information", metavar='yes/no')
     
         args = parser.parse_args()
         wrongArgumentsFlag = False
@@ -568,6 +570,7 @@ if __name__=="__main__":
         GROUPRECORDS = True if args.grouprecords=="yes" else False
         GROUPRECORDSLEVEL2 = True if args.grouprecordslevel2=="yes" else False
         VERBOSE = True if args.verbose=="yes" else False
+        DEBUG_MODE = True if args.debug=="yes" else False
         ##############################################################################
         
         sys.stdout = Logger(LOGFILEPATH, VERBOSE)
@@ -591,6 +594,7 @@ if __name__=="__main__":
         print("Group records: ", "yes" if GROUPRECORDS else "no")
         print("Group records level 2: ", "yes" if GROUPRECORDSLEVEL2 else "no")
         print("Show information on screen:", args.verbose)
+        print("Show debug information:", args.debug)
         
         # conversion engine class
         dataConverter = DataConverter(PYTHONENCODING, INPUTENCODING)
@@ -623,6 +627,8 @@ if __name__=="__main__":
                 headerFieldByteSize = layoutDefinition.header.size
                 f_in.read(headerFieldByteSize)
                 NumberOfRecordsRead += headerFieldByteSize
+                if DEBUG_MODE:
+                    print('Skipped header: {} bytes. Number of bytes read: {}'.format(headerFieldByteSize, NumberOfRecordsRead))
             
             #stop processing if left bytes
             footerFieldByteSize = 0
@@ -636,6 +642,8 @@ if __name__=="__main__":
                 for keyField in layoutDefinition.keyFields:
                     recordSizeBytes = f_in.read(keyField.size)
                     NumberOfRecordsRead += keyField.size
+                    if DEBUG_MODE:
+                        print('Multiple layouts. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(keyField.size, NumberOfRecordsRead, recordSizeBytes))
                     if(recordSizeBytes):
                         keyField.rawValue = recordSizeBytes
                     else:
@@ -645,6 +653,8 @@ if __name__=="__main__":
                 layoutSize = layoutFields.layoutSize
                 recordSizeBytes = f_in.read(layoutSize)
                 NumberOfRecordsRead += layoutSize
+                if DEBUG_MODE:
+                    print('Single layout. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(layoutSize, NumberOfRecordsRead, recordSizeBytes))
             
             # it shows related groups for each layout. A value is reset when the first layout is met. The first layout in a layout file defines relaetd group start
             relatedGroup = None
@@ -666,13 +676,17 @@ if __name__=="__main__":
                 #convert key values
                 for keyField in layoutDefinition.keyFields:
                     if keyField.type!=SKIPFIELDTYPENAME:
-                        keyField.convertedValue = dataConverter.convert(keyField.rawValue, keyField)           
+                        keyField.convertedValue = dataConverter.convert(keyField.rawValue, keyField)
+                        if DEBUG_MODE:
+                            print('Key field: {}. Number of bytes read: {}'.format(keyField, NumberOfRecordsRead))         
     
                 # check if record type in layouts and extract layout
                 isFoundLayout = False
                 if layoutDefinition.isMultipleLayouts:
                     layoutTypeFields = []
                     for layout in layoutDefinition.layouts:
+                        if DEBUG_MODE:
+                            print('Schema name: {}. Number of bytes read: {}'.format(layout.layoutType, NumberOfRecordsRead))
                         if layout.isLayoutConditional:
                             condition = layout.layoutType[0:2]
                             conditionParameter = layout.layoutType[3:]
@@ -680,17 +694,23 @@ if __name__=="__main__":
                                 if str(conditionParameter).strip()!=str(layoutDefinition.keyLayoutType.convertedValue).strip():
                                     foundLayout = layout
                                     isFoundLayout = True
+                                    if DEBUG_MODE:
+                                        print('Multiple schemas. Found conditional record. Condition: {}. Condition operand: {}. Source value: {}. Number of bytes read: {}'.format(condition, conditionParameter, str(layoutDefinition.keyLayoutType.convertedValue).strip(), NumberOfRecordsRead))
                             else:
                                 raise KnownIssue("Error in layout type condition: condition is not supported: " + layout.layoutType)
                         else:
                             if str(layout.layoutType).strip()==str(layoutDefinition.keyLayoutType.convertedValue).strip():
                                 foundLayout = layout
                                 isFoundLayout = True
+                                if DEBUG_MODE:
+                                    print('Multiple schemas. Found record. Source value: {}. Number of bytes read: {}'.format(str(layoutDefinition.keyLayoutType.convertedValue).strip(), NumberOfRecordsRead))
                                 break
                 else:
                     #there is only 1 layout
                     isFoundLayout = True
                     foundLayout = layoutDefinition.layouts[0]
+                    if DEBUG_MODE:
+                        print('Single schema. Found record. Layout name: {}. Number of bytes read: {}'.format(layoutDefinition.layouts[0].layoutType, NumberOfRecordsRead))
                 
                 if(not isFoundLayout):
                     # we need to store message in a variable because KnowIssue doesn't catch any errors if "str(recordLayoutType)" fails
@@ -709,6 +729,8 @@ if __name__=="__main__":
     
                 outputParentFileName = fileName + "_type_" + str(foundLayout.layoutType).replace(" ", "_")
                 outputParentPath = path.join(outputFolder, outputParentFileName + OUTPUTFILEEXTENSION)
+                if DEBUG_MODE:
+                    print('Schema file path: {}. Number of bytes read: {}'.format(outputParentPath, NumberOfRecordsRead))
                 
                 #if((len(layoutTypeFields)>0):
                 if(not outputParentFileName in outputOpenFiles):
@@ -726,10 +748,14 @@ if __name__=="__main__":
                         recordSize = layoutDefinition.keyLayoutSize.convertedValue - layoutDefinition.keyLayoutSize.size - layoutDefinition.keyLayoutType.size + foundLayout.terminatorSize
                         record = f_in.read(recordSize)
                         NumberOfRecordsRead += recordSize
+                        if DEBUG_MODE:
+                            print('Multi-schema with variable fields. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(recordSize, NumberOfRecordsRead, record))
                     else:
                         recordSize = foundLayout.layoutSize
                         record = f_in.read(recordSize)
                         NumberOfRecordsRead += recordSize
+                        if DEBUG_MODE:
+                            print('Multi-schema without variable fields. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(recordSize, NumberOfRecordsRead, record))
                 else:
                     record = recordSizeBytes
                 
@@ -739,10 +765,14 @@ if __name__=="__main__":
                 if layoutDefinition.isMultipleLayouts and GROUPRECORDS:
                     if(str(layoutDefinition.layouts[0].layoutType).strip()==str(foundLayout.layoutType)):
                         relatedGroup = uuid.uuid4().hex
+                        if DEBUG_MODE:
+                            print('Generated related group: {}. Number of bytes read: {}'.format(relatedGroup, NumberOfRecordsRead))
                         
                 if layoutDefinition.isMultipleLayouts and GROUPRECORDSLEVEL2:
                     if(str(layoutDefinition.layouts[1].layoutType).strip()==str(foundLayout.layoutType)):
                         relatedGroupLevel2 = uuid.uuid4().hex
+                        if DEBUG_MODE:
+                            print('Generated related group level 2: {}. Number of bytes read: {}'.format(relatedGroupLevel2, NumberOfRecordsRead))
                 
                 recordBuf = ""
                 
@@ -753,10 +783,16 @@ if __name__=="__main__":
                     fieldStart = field.start
                     fieldEnd= fieldStart + fieldSize
                     
+                    if DEBUG_MODE:
+                        print('Field name: {}. Number of bytes read: {}'.format(fieldName, NumberOfRecordsRead))
+                        
                     # don't extract field value if field type is "skip"
                     if(fieldType!=SKIPFIELDTYPENAME):
                         try: 
-                            recordBuf = recordBuf + delimiter + str(dataConverter.convert(record[fieldStart:fieldEnd], field))
+                            fieldValue = str(dataConverter.convert(record[fieldStart:fieldEnd], field))
+                            recordBuf = recordBuf + delimiter + fieldValue
+                            if DEBUG_MODE:
+                                print('Field value: {}. Number of bytes read: {}. Record buffer: {}'.format(fieldValue, NumberOfRecordsRead, recordBuf))
                         except UnicodeEncodeError as ex:
                             if(IGNORECONVERSIONERRORS):
                                 print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
@@ -780,6 +816,8 @@ if __name__=="__main__":
                     if headerField.type!=SKIPFIELDTYPENAME:
                         if headerField.keytype==None:
                             recordBuf = recordBuf + delimiter + str(headerField.convertedValue)
+                            if DEBUG_MODE:
+                                print('Header field: {}. Number of bytes read: {}. Record buffer: {}'.format(headerField, NumberOfRecordsRead, recordBuf))
                 
                 # adding FileTag
                 recordBuf = recordBuf + delimiter + fileName
@@ -787,24 +825,33 @@ if __name__=="__main__":
                 # adding special keys to link records together
                 if layoutDefinition.isMultipleLayouts and GROUPRECORDS:
                     recordBuf = recordBuf + delimiter + str(relatedGroup)
+                    if DEBUG_MODE:
+                        print('Added related group: {}. Number of bytes read: {}. Record buffer: {}'.format(relatedGroup, NumberOfRecordsRead, recordBuf))
                 
                 # adding special keys to link level 2 records together    
                 if layoutDefinition.isMultipleLayouts and GROUPRECORDSLEVEL2:
                     if(str(layoutDefinition.layouts[0].layoutType).strip()!=str(foundLayout.layoutType).strip()):
                         recordBuf = recordBuf + delimiter + str(relatedGroupLevel2)
+                        if DEBUG_MODE:
+                            print('Added related group level2: {}. Number of bytes read: {}. Record buffer: {}'.format(relatedGroupLevel2, NumberOfRecordsRead, recordBuf))
                         
                 if(foundLayout.isVariableFields):
                     # link static and variable records    
                     unqKey = uuid.uuid4().hex
                     recordBuf = recordBuf + delimiter + str(unqKey)
+                    if DEBUG_MODE:
+                        print('Unique key to link variable records: {}. Number of bytes read: {}. Record buffer: {}'.format(unqKey, NumberOfRecordsRead, recordBuf))
                 
                 recordBuf = recordBuf + NEWLINE
                 f_out.write(recordBuf)
+                if DEBUG_MODE:
+                    print('Record written. Number of bytes read: {}'.format(NumberOfRecordsRead))
     
                 if(foundLayout.isVariableFields):
                     outputVariableFileName = fileName + "_type_" + str(foundLayout.layoutType) + "_variable"
                     outputVariablePath = path.join(outputFolder, outputVariableFileName + OUTPUTFILEEXTENSION)
-    
+                    if DEBUG_MODE:
+                        print('Variable fields file path: {}. Number of bytes read: {}'.format(outputVariablePath, NumberOfRecordsRead))
                     
                     if(not outputVariableFileName in outputOpenFiles):
                         outputOpenFiles[outputVariableFileName] = codecs.open(outputVariablePath,"w", encoding=OUTPUTENCODING)
@@ -818,11 +865,17 @@ if __name__=="__main__":
                     fieldStart = field.start
                     fieldEnd= fieldStart + fieldSize
                     numberDymanicRecords = dataConverter.convert(record[fieldStart:fieldEnd], field)
-    
+                    
+                    if DEBUG_MODE:
+                        print('Record name: {}. Number dynamic records: {}. Number of bytes read: {}.'.format(fieldName, numberDymanicRecords, NumberOfRecordsRead))
+                        
                     for i in range(0, int(numberDymanicRecords)):
                                 
                         delimiter=""
                         recordVariableBuf = ""
+                        
+                        if DEBUG_MODE:
+                            print('Dynamic record index: {}.Number of bytes read: {}.'.format(i, NumberOfRecordsRead))
                         
                         for field in foundLayout.variableFields:
                             fieldName = field.name
@@ -831,12 +884,22 @@ if __name__=="__main__":
                             fieldStart = currentRecordPosition + field.start
                             fieldEnd= fieldStart + fieldSize
                             
+                            if DEBUG_MODE:
+                                print('Dynamic field name: {}. Number of bytes read: {}.'.format(fieldName, NumberOfRecordsRead))
+                            
                             # don't extract field value if field type is "skip"
                             if(fieldType==SKIPFIELDTYPENAME):
                                 recordVariableBuf = recordVariableBuf + delimiter
+                                if DEBUG_MODE:
+                                    print('Skip field. Number of bytes read: {}. Variable record buffer: {}'.format(NumberOfRecordsRead, recordVariableBuf))
                             else:
                                 try: 
-                                    recordVariableBuf = recordVariableBuf + delimiter + str(dataConverter.convert(record[fieldStart:fieldEnd], field))
+                                    variableFieldValue = str(dataConverter.convert(record[fieldStart:fieldEnd], field))
+                                    recordVariableBuf = recordVariableBuf + delimiter + variableFieldValue
+                                    
+                                    if DEBUG_MODE:
+                                        print('Variable field value: {}. Number of bytes read: {}. Variable record buffer: {}'.format(variableFieldValue, NumberOfRecordsRead, recordVariableBuf))
+                                        
                                 except UnicodeEncodeError as ex:
                                     if(IGNORECONVERSIONERRORS):
                                         print(convert_error_message(foundLayout.layoutType, field, record[fieldStart:fieldEnd], ex))
@@ -856,21 +919,31 @@ if __name__=="__main__":
                         
                         # adding FileTag
                         recordVariableBuf = recordVariableBuf + delimiter + fileName
+                        if DEBUG_MODE:
+                            print('Adding File Tag. Number of bytes read: {}. Variable record buffer: {}'.format(NumberOfRecordsRead, recordVariableBuf))
                 
                         # adding special keys to link records together
                         if GROUPRECORDS:
                             recordVariableBuf = recordVariableBuf + delimiter + str(relatedGroup)
+                            if DEBUG_MODE:
+                                print('Adding related group: {}. Number of bytes read: {}. Variable record buffer: {}'.format(relatedGroup, NumberOfRecordsRead, recordVariableBuf))
                         
                         # adding special keys to link level2 records together    
                         if GROUPRECORDSLEVEL2:
                             if(str(layoutDefinition.layouts[0].layoutType).strip()!=str(foundLayout.layoutTyp).strip()):
                                 recordVariableBuf = recordVariableBuf + delimiter + str(relatedGroupLevel2)
+                                if DEBUG_MODE:
+                                    print('Adding related group level 2: {}. Number of bytes read: {}. Variable record buffer: {}'.format(relatedGroupLevel2, NumberOfRecordsRead, recordVariableBuf))
                         
                         # adding parent-child relationship between static and dynamic records
                         recordVariableBuf = recordVariableBuf + delimiter + str(unqKey)
+                        if DEBUG_MODE:
+                            print('Adding Unique Key to link dynamic records: {}. Number of bytes read: {}. Variable record buffer: {}'.format(unqKey, NumberOfRecordsRead, recordVariableBuf))
                         
                         recordVariableBuf = recordVariableBuf + NEWLINE
                         f_outVariable.write(recordVariableBuf)
+                        if DEBUG_MODE:
+                            print('Variable record written: {}. Number of bytes read: {}'.format(NumberOfRecordsRead))
     
                         layoutTypeName = "Processed variable type "
                                     
@@ -888,6 +961,8 @@ if __name__=="__main__":
                     for keyField in layoutDefinition.keyFields:
                         recordSizeBytes = f_in.read(keyField.size)
                         NumberOfRecordsRead += keyField.size
+                        if DEBUG_MODE:
+                            print('Milti-schema. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(keyField.size, NumberOfRecordsRead, recordSizeBytes))
                         if(recordSizeBytes):
                             keyField.rawValue = recordSizeBytes
                         else:
@@ -897,6 +972,8 @@ if __name__=="__main__":
                     layoutSize = layoutFields.layoutSize
                     recordSizeBytes = f_in.read(layoutSize)
                     NumberOfRecordsRead += layoutSize
+                    if DEBUG_MODE:
+                        print('Single schema. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(layoutSize, NumberOfRecordsRead, recordSizeBytes))
                 
         print()            
         keys = sorted(recordCount.keys())
