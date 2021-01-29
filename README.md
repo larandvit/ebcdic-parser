@@ -13,6 +13,7 @@ Conversion rules are a driver to parse EBCDIC data.
 
 * Supported layouts
     1. Single schema
+       * Original [COBOL layout](test_data/pr_p1_p2_gas_disposition/oga0861.pdf) and corresponding [conversion rules](layout_repository/gsf102_rules.json) file
     2. Multi-schema fixed record length
        * Original [COBOL layout](test_data/ola013k/ola013k.pdf) and corresponding [conversion rules](layout_repository/ola013k_rules.json) file
     3. Multi-schema variable record length
@@ -127,7 +128,7 @@ Exit codes: 0 - successful completion, 1 - completion with any error
 ```
 
 ## Samples
-### Single schema
+### Single schema #1
 
 ```bash
 ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "./test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "./layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter ,
@@ -136,7 +137,7 @@ ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_str
 * Output location: ./test_data/311_calls_for_service_requests_all_strings/output
 * Log file: ./ebcdic_parser.log
 
-### Single schema in debug mode
+### Single schema in debug mode #1
 
 ```bash
 ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "./test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "./layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter , --debug yes
@@ -146,6 +147,16 @@ ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_str
 * Outptut format: comma delimited ASCII file
 * Log file: ./ebcdic_parser.log
 
+### Single schema #2
+
+```bash
+ebcdic_parser.py --inputfile "./test_data/pr_p1_p2_gas_disposition/gsf102.ebc" --outputfolder "./test_data/pr_p1_p2_gas_disposition/output" --layoutfile "./layout_repository/gsf102_rules.json" --logfolder "./test_data/pr_p1_p2_gas_disposition/log"
+```
+
+* Output location: ./test_data/pr_p1_p2_gas_disposition/output
+* Outptut format: tab delimited ASCII file
+* Log folder: ./test_data/pr_p1_p2_gas_disposition/log
+
 ### Multi-schema fixed record length
 
 ```bash
@@ -154,7 +165,7 @@ ebcdic_parser.py --inputfile "./test_data/ola013k/olf001l.ebc" --outputfolder ".
 
 * Output location: ./test_data/ola013k/output
 * Outptut format: tab delimited ASCII file
-* Log file: ./test_data/ola013k/log
+* Log folder: ./test_data/ola013k/log
 
 ## Testing
 ### Functional tests

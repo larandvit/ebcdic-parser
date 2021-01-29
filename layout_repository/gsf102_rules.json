@@ -1,0 +1,167 @@
+{
+    "description": "gsf102",
+    "layouts": [
+        {
+            "layoutname": "GD-PR-CASINGHEAD-DISP-TRANS-RECORD",
+            "layouttype":"main",
+            "layout": [
+                {
+                    "name": "GD-PR-DISTRICT",
+                    "type": "string",
+                    "size": 2,
+                    "linenumber": 3
+                },
+                {
+                    "name": "GD-PR-LEASE-NO",
+                    "type": "string",
+                    "size": 5,
+                    "linenumber": 5
+                },
+                {
+                    "name": "GD-PR-REPORT-CENT",
+                    "type": "string",
+                    "size": 2,
+                    "linenumber": 8
+                },
+                {
+                    "name": "GD-PR-REPORT-YEAR",
+                    "type": "string",
+                    "size": 2,
+                    "linenumber": 9
+                },
+                {
+                    "name": "GD-PR-REPORT-MONTH",
+                    "type": "string",
+                    "size": 2,
+                    "linenumber": 10
+                },
+                {
+                    "name": "GD-PR-CASINGHEADBALANCING-CODE",
+                    "type": "string",
+                    "size": 1,
+                    "linenumber": 11
+                },
+                {
+                    "name": "GD-PR-DISCREPANCY-PRINTED-CODE",
+                    "type": "string",
+                    "size": 1,
+                    "linenumber": 14
+                },
+                {
+                    "name": "GD-PR-DISPOSITION-CODE-FLAG",
+                    "type": "string",
+                    "size": 1,
+                    "linenumber": 17
+                },
+                {
+                    "name": "GD-PR-FIELD-NUMBER",
+                    "type": "string",
+                    "size": 8,
+                    "linenumber": 20
+                },
+                {
+                    "name": "GD-PR-CODING-MAST-OP-NUMBER",
+                    "type": "string",
+                    "size": 6,
+                    "linenumber": 21
+                },
+                {
+                    "name": "GD-PR-COMPANY-TAPE-OP-NUMBER",
+                    "type": "string",
+                    "size": 6,
+                    "linenumber": 22
+                },
+                {
+                    "name": "GD-PR-LEASE-NAME",
+                    "type": "string",
+                    "size": 32,
+                    "linenumber": 23
+                },
+                {
+                    "name": "GD-PR-FIELD-NAME",
+                    "type": "string",
+                    "size": 32,
+                    "linenumber": 24
+                },
+                {
+                    "name": "GD-PR-BATCH-CODE",
+                    "type": "string",
+                    "size": 1,
+                    "linenumber": 26
+                },
+                {
+                    "name": "GD-PR-CERT-DATE",
+                    "type": "string",
+                    "size": 2,
+                    "linenumber": 27
+                },
+                {
+                    "name": "GD-PR-LEASE-FLD-FUEL-SYSTEMS",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 29
+                },
+                {
+                    "name": "GD-PR-TRANSMISSION-LINE",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 30
+                },
+                {
+                    "name": "GD-PR-PROCESSING-PLANT",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 31
+                },
+                {
+                    "name": "GD-PR-VENTED-OR-FLARED",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 32
+                },
+                {
+                    "name": "GD-PR-CASINGHEAD-LIFT",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 33
+                },
+                {
+                    "name": "GD-PR-PRESSURE-MAINTENANCE",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 34
+                },
+                {
+                    "name": "GD-PR-CARBON-BLACK",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 35
+                },
+                {
+                    "name": "GD-PR-UNDERGROUND-STORAGE",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 36
+                },
+                {
+                    "name": "GD-PR-CASINGHEAD-PRODUCTION",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 37
+                },
+                {
+                    "name": "GD-PR-CASINGHEAD-LIFT-GAS-INJECTED",
+                    "type": "string",
+                    "size": 9,
+                    "linenumber": 38
+                },
+                {
+                    "name": "FILLER-1",
+                    "type": "string",
+                    "size": 7,
+                    "linenumber": 41
+                }
+            ]
+        }
+    ]
+}
