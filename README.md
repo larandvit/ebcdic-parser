@@ -149,10 +149,10 @@ ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_str
 ### Multi-schema fixed record length
 
 ```bash
-ebcdic_parser.py --inputfile "./test_data/ola013k\olf001l.ebc" --outputfolder "./test_data/ola013k/output" --layoutfile "./layout_repository/ola013k_rules.json" --logfolder "./test_data/ola013k/log"
+ebcdic_parser.py --inputfile "./test_data/ola013k/olf001l.ebc" --outputfolder "./test_data/ola013k/output" --layoutfile "./layout_repository/ola013k_rules.json" --logfolder "./test_data/ola013k/log"
 ```
 
-* Output location: ./test_data/311_calls_for_service_requests_all_strings/output
+* Output location: ./test_data/ola013k/output
 * Outptut format: tab delimited ASCII file
 * Log file: ./test_data/ola013k/log
 
