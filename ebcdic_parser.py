@@ -37,7 +37,7 @@ import unicodedata
 __author__ = "Vitaly Saversky"
 __date__ = "2017-10-04"
 __credits__ = ["Vitaly Saversky"]
-__version__ = "2.3.0"
+__version__ = "2.4.0"
 __maintainer__ = "Vitaly Saversky"
 __email__ = "larandvit@hotmail.com"
 __status__ = "Production"
@@ -46,6 +46,7 @@ class FileFormat(IntEnum):
     SingleSchema = 1
     MultiSchemaFixed = 2
     MultiSchemaVariable = 3
+    SingleSchemaVariable = 4
     
 NEWLINE = "\n"
 LOGFILENAME = "ebcdic_parser.log"
@@ -84,6 +85,7 @@ LAYOUTELEMENT_KEYTYPE = "keytype"
 
 LAYOUTVALUE_KEYTYPE_LAYOUTTYPE = "layouttype"
 LAYOUTVALUE_KEYTYPE_LAYOUTSIZE = "layoutsize"
+LAYOUTVALUE_KEYTYPE_VARIABLEREPEATTIMES = "variablerepeattimes"
 
 LAYOUTLIST_FIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SIZE, LAYOUTELEMENT_SCALE]
 LAYOUTLIST_KEYFIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SIZE, LAYOUTELEMENT_SCALE, LAYOUTELEMENT_KEYTYPE]
@@ -91,6 +93,7 @@ LAYOUTLIST_KEYFIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SI
 FILEFORMATS = {FileFormat.SingleSchema:"Single schema",
                FileFormat.MultiSchemaFixed:"Multi-schema fixed length",
                FileFormat.MultiSchemaVariable:"Multi-schema variable length",
+               FileFormat.SingleSchemaVariable: "Single schema variable length"
               }
 
 class KnownIssue(Exception):
@@ -139,6 +142,7 @@ class LayoutFields():
         self.variableLayoutSize = None
         self.isVariableFields = None
         self.terminatorSize = None
+        self.variablerepeattimes = -1
 
 class LayoutDefinition():
     def __init__(self):
@@ -315,6 +319,19 @@ class LayoutDefinition():
                         
                         layoutFields.fields.append(layoutField)
                     
+                    #find variablerepeattimes key type
+                    keytype_variablerepeattimes_index = -1
+                    field_index = 0
+                    if(LAYOUTELEMENT_VARIABLELAYOUT in layout):
+                        for field in layout[LAYOUTELEMENT_LAYOUT]:
+                            if LAYOUTELEMENT_KEYTYPE in field and field[LAYOUTELEMENT_KEYTYPE]==LAYOUTVALUE_KEYTYPE_VARIABLEREPEATTIMES:
+                                keytype_variablerepeattimes_index = field_index
+                                break
+                            field_index += 1
+                    
+                    #add index of a field which holds number of times to repeat variable fields. If value=-1, it means (1) no variable fields or the last field (default value) 
+                    layoutFields.variablerepeattimes = keytype_variablerepeattimes_index
+                    
                     #add start position and calc total size for variable fields
                     startPosition = 0
                     layoutFields.variableLayoutSize = 0
@@ -358,8 +375,10 @@ class LayoutDefinition():
                     return not self.isError
                 
                 #calculate file format
-                if not self.isMultipleLayouts:
+                if not self.isMultipleLayouts and not self.isVariableFields:
                     self.fileFormat = FileFormat.SingleSchema.value
+                elif not self.isMultipleLayouts and self.isVariableFields:
+                    self.fileFormat = FileFormat.SingleSchemaVariable.value
                 elif self.isMultipleLayouts and not self.isVariableFields:
                     self.fileFormat = FileFormat.MultiSchemaFixed.value
                 else:
@@ -505,6 +524,9 @@ class DataConverter():
 def convert_error_message(recordLayoutType, field, fieldBytes, catchedError):
     return "Conversation error\t" + "Layout type: " + recordLayoutType + "\t" + str(field.name) + "\t" + str(fieldBytes) + "\t" + str(catchedError)
 
+def show_bytes(record):
+    return [hex(num) for num in record]
+
 if __name__=="__main__":
 
     returnCode = 1
@@ -638,12 +660,12 @@ if __name__=="__main__":
             fileSize = os.stat(filePath).st_size
             
             # read the first portion of data. In some cases, we read entire record, other cases, we read record size and/or record type
-            if(layoutDefinition.isMultipleLayouts):
+            if(layoutDefinition.isVariableFields):
                 for keyField in layoutDefinition.keyFields:
                     recordSizeBytes = f_in.read(keyField.size)
                     NumberOfRecordsRead += keyField.size
                     if DEBUG_MODE:
-                        print('Multiple layouts. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(keyField.size, NumberOfRecordsRead, recordSizeBytes))
+                        print('Key field processing: {}. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(keyField.name, keyField.size, NumberOfRecordsRead, show_bytes(recordSizeBytes)))
                     if(recordSizeBytes):
                         keyField.rawValue = recordSizeBytes
                     else:
@@ -654,8 +676,8 @@ if __name__=="__main__":
                 recordSizeBytes = f_in.read(layoutSize)
                 NumberOfRecordsRead += layoutSize
                 if DEBUG_MODE:
-                    print('Single layout. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(layoutSize, NumberOfRecordsRead, recordSizeBytes))
-            
+                    print('Single layout. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(layoutSize, NumberOfRecordsRead, show_bytes(recordSizeBytes)))
+
             # it shows related groups for each layout. A value is reset when the first layout is met. The first layout in a layout file defines relaetd group start
             relatedGroup = None
             #if GROUPRECORDS:
@@ -678,7 +700,7 @@ if __name__=="__main__":
                     if keyField.type!=SKIPFIELDTYPENAME:
                         keyField.convertedValue = dataConverter.convert(keyField.rawValue, keyField)
                         if DEBUG_MODE:
-                            print('Key field: {}. Number of bytes read: {}'.format(keyField, NumberOfRecordsRead))         
+                            print('Key field processed: {}. Value: {}. Number of bytes read: {}'.format(keyField.name, keyField.convertedValue, NumberOfRecordsRead))         
     
                 # check if record type in layouts and extract layout
                 isFoundLayout = False
@@ -749,13 +771,19 @@ if __name__=="__main__":
                         record = f_in.read(recordSize)
                         NumberOfRecordsRead += recordSize
                         if DEBUG_MODE:
-                            print('Multi-schema with variable fields. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(recordSize, NumberOfRecordsRead, record))
+                            print('Multi-schema with variable fields. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(recordSize, NumberOfRecordsRead, show_bytes(record)))
                     else:
                         recordSize = foundLayout.layoutSize
                         record = f_in.read(recordSize)
                         NumberOfRecordsRead += recordSize
                         if DEBUG_MODE:
-                            print('Multi-schema without variable fields. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(recordSize, NumberOfRecordsRead, record))
+                            print('Multi-schema without variable fields. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(recordSize, NumberOfRecordsRead, show_bytes(record)))
+                elif layoutDefinition.fileFormat==FileFormat.SingleSchemaVariable:
+                    recordSize = layoutDefinition.keyLayoutSize.convertedValue - layoutDefinition.keyLayoutSize.size
+                    record = f_in.read(recordSize)
+                    NumberOfRecordsRead += recordSize
+                    if DEBUG_MODE:
+                        print('Data record. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(recordSize, NumberOfRecordsRead, show_bytes(record)))
                 else:
                     record = recordSizeBytes
                 
@@ -859,18 +887,23 @@ if __name__=="__main__":
                     f_outVariable = outputOpenFiles[outputVariableFileName]
                     
                     #find number of variable records which sitting in the last field of the current record
+                    variable_repeat_times_index = foundLayout.variablerepeattimes
+                    if variable_repeat_times_index==-1:
+                        variable_repeat_times_index = len(foundLayout.fields) - 1
+                        
+                    field = foundLayout.fields[variable_repeat_times_index]
                     fieldName = field.name
                     fieldType = field.type
                     fieldSize = field.size
                     fieldStart = field.start
                     fieldEnd= fieldStart + fieldSize
+                    
                     numberDymanicRecords = dataConverter.convert(record[fieldStart:fieldEnd], field)
                     
                     if DEBUG_MODE:
                         print('Record name: {}. Number dynamic records: {}. Number of bytes read: {}.'.format(fieldName, numberDymanicRecords, NumberOfRecordsRead))
-                        
+                       
                     for i in range(0, int(numberDymanicRecords)):
-                                
                         delimiter=""
                         recordVariableBuf = ""
                         
@@ -896,7 +929,7 @@ if __name__=="__main__":
                                 try: 
                                     variableFieldValue = str(dataConverter.convert(record[fieldStart:fieldEnd], field))
                                     recordVariableBuf = recordVariableBuf + delimiter + variableFieldValue
-                                    
+
                                     if DEBUG_MODE:
                                         print('Variable field value: {}. Number of bytes read: {}. Variable record buffer: {}'.format(variableFieldValue, NumberOfRecordsRead, recordVariableBuf))
                                         
@@ -962,18 +995,27 @@ if __name__=="__main__":
                         recordSizeBytes = f_in.read(keyField.size)
                         NumberOfRecordsRead += keyField.size
                         if DEBUG_MODE:
-                            print('Milti-schema. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(keyField.size, NumberOfRecordsRead, recordSizeBytes))
+                            print('Milti-schema. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(keyField.size, NumberOfRecordsRead, show_bytes(recordSizeBytes)))
                         if(recordSizeBytes):
                             keyField.rawValue = recordSizeBytes
                         else:
                             break
+                elif layoutDefinition.fileFormat==FileFormat.SingleSchemaVariable:
+                    recordSizeBytes = f_in.read(keyField.size)
+                    NumberOfRecordsRead += keyField.size
+                    if DEBUG_MODE:
+                        print('Next record. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(keyField.size, NumberOfRecordsRead, show_bytes(recordSizeBytes)))
+                    if(recordSizeBytes):
+                            keyField.rawValue = recordSizeBytes
+                    else:
+                        break
                 else:
                     layoutFields = layoutDefinition.layouts[0];
                     layoutSize = layoutFields.layoutSize
                     recordSizeBytes = f_in.read(layoutSize)
                     NumberOfRecordsRead += layoutSize
                     if DEBUG_MODE:
-                        print('Single schema. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(layoutSize, NumberOfRecordsRead, recordSizeBytes))
+                        print('Single schema. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(layoutSize, NumberOfRecordsRead, show_bytes(recordSizeBytes)))
                 
         print()            
         keys = sorted(recordCount.keys())

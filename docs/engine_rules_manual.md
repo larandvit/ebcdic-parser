@@ -10,6 +10,7 @@ There are supported layouts
 1. Single schema
 2. Multi-schema fixed record length
 3. Multi-schema variable record length.
+4. Single schema variable record length.
     
 ## Engine Rules Structure
 
@@ -63,6 +64,9 @@ A list of fields used to parse EBCDIC file. The field types are
 3. Multi-schema variable length
     * Record length field description. Key type is layoutsize.
     * Record type field description. Key type is layouttype.
+    * How many times variable part is repeated. Key type is variablerepeattimes. It's an optional fields. If skipped, the last record in the layout is a holder. It's applicable to layout fields.
+4. Single schema variable length
+    * How many times variable part is repeated. Key type is variablerepeattimes. It's an optional fields. If skipped, the last record in the layout is a holder. It's applicable to layout fields.
     
 It can be added more fields to keyfields section. Those fields can be skipped or added to an output file. 
 
@@ -127,6 +131,9 @@ Full [field size](https://github.com/larandvit/ebcdic-parser/blob/master/docs/co
 
 ### scale
 [Size of decimals](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md).
+
+### keytype
+The values is variablerepeattimes. It's a flag which shows a field with number of variable records. The field is optional one.
 
 ## Layout Data Types
 It’s correspond to [COBOL data types](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md).
