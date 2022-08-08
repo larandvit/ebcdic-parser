@@ -18,7 +18,7 @@ Conversion rules are a driver to parse EBCDIC data.
        * Original [COBOL layout](test_data/ola013k/ola013k.pdf) and corresponding [conversion rules](layout_repository/ola013k_rules.json) file
     3. Multi-schema variable record length
     4. Single schema variable record length
-       * Original [COBOL layout](test_data\service_segment_data\129.1DP.pdf) and corresponding [conversion rules](layout_repository/service_segment_data.json) file
+       * Original [COBOL layout](test_data/service_segment_data/129.1DP.pdf) and corresponding [conversion rules](layout_repository/service_segment_data.json) file
  
 * Fixing anomalies in EBCDIC files
     1. Skip header
