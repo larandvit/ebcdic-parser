@@ -138,6 +138,7 @@ ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_str
 ```
 
 * Output location: ./test_data/311_calls_for_service_requests_all_strings/output
+* Outptut format: comma delimited ASCII file
 * Log file: ./ebcdic_parser.log
 
 ### Single schema in debug mode #1
@@ -169,6 +170,16 @@ ebcdic_parser.py --inputfile "./test_data/ola013k/olf001l.ebc" --outputfolder ".
 * Output location: ./test_data/ola013k/output
 * Outptut format: tab delimited ASCII file
 * Log folder: ./test_data/ola013k/log
+
+### Single schema variable record length
+
+```bash
+ebcdic_parser.py --inputfile "./test_data/service_segment_data/RG197.SERVSEG.Y70.ebc" --outputfolder "./test_data/service_segment_data/output" --layoutfile "./layout_repository/service_segment_data.json" --logfolder "./test_data/service_segment_data/log"
+```
+
+* Output location: ./test_data/service_segment_data/output
+* Outptut format: tab delimited ASCII file
+* Log folder: ./test_data/service_segment_data/log
 
 ## Testing
 ### Functional tests
