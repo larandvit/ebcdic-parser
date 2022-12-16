@@ -37,7 +37,7 @@ import unicodedata
 __author__ = "Vitaly Saversky"
 __date__ = "2017-10-04"
 __credits__ = ["Vitaly Saversky"]
-__version__ = "2.4.0"
+__version__ = "2.4.1"
 __maintainer__ = "Vitaly Saversky"
 __email__ = "larandvit@hotmail.com"
 __status__ = "Production"
@@ -391,7 +391,7 @@ class LayoutDefinition():
         except Exception as err:
             error_class = err.__class__.__name__
             detail = err.args[0]
-            cl, exc, tb = sys.exc_info()
+            _, _, tb = sys.exc_info()
             line_number = traceback.extract_tb(tb)[-1][1]
             errText = '{} at line {}: {}'.format(error_class, line_number, detail)
             if not str(sys.exc_info()[1])==str(detail):
@@ -660,7 +660,7 @@ if __name__=="__main__":
             fileSize = os.stat(filePath).st_size
             
             # read the first portion of data. In some cases, we read entire record, other cases, we read record size and/or record type
-            if(layoutDefinition.isVariableFields):
+            if(layoutDefinition.fileFormat in (FileFormat.MultiSchemaFixed, FileFormat.MultiSchemaVariable, FileFormat.SingleSchemaVariable)):
                 for keyField in layoutDefinition.keyFields:
                     recordSizeBytes = f_in.read(keyField.size)
                     NumberOfRecordsRead += keyField.size
