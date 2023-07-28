@@ -83,7 +83,7 @@ pip install ebcdic_parser
 ### Sample
 
 ```python
-from ebcdic_parser.ebcdic_parser import run 
+from ebcdic_parser.convert import run 
 
 
 run("../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat", 
