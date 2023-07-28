@@ -18,6 +18,7 @@ import os.path as path
 import os
 import sys
 import traceback
+from pathlib import Path
 
 import json
 import codecs
@@ -37,7 +38,7 @@ import unicodedata
 __author__ = "Vitaly Saversky"
 __date__ = "2017-10-04"
 __credits__ = ["Vitaly Saversky"]
-__version__ = "2.4.1"
+__version__ = "3.0.0"
 __maintainer__ = "Vitaly Saversky"
 __email__ = "larandvit@hotmail.com"
 __status__ = "Production"
@@ -527,8 +528,20 @@ def convert_error_message(recordLayoutType, field, fieldBytes, catchedError):
 def show_bytes(record):
     return [hex(num) for num in record]
 
-if __name__=="__main__":
-
+def run(inputFile, 
+        outputFolder,
+        layoutFile,
+        logfolder='',
+        pythonEncoding=PYTHONENCODING,
+        encodingName=INPUTENCODING,
+        outputDelimiter=DELIMITER,
+        outputFileExtension=OUTPUTFILEEXTENSION,
+        ignoreConversionErrors=IGNORECONVERSIONERRORS,
+        groupRecords=GROUPRECORDS,
+        groupRecordsLevel2=GROUPRECORDSLEVEL2,
+        verbose=VERBOSE,
+        debug=DEBUG_MODE):
+    
     returnCode = 1
     
     dataConverter = None
@@ -543,80 +556,26 @@ if __name__=="__main__":
     NumberOfRecordsRead = 0
         
     try:
-        appDescription = "Convert EBCDIC data into delimited text format. Version " + __version__
-        appDescription += "\n"
-        appDescription += "\nSupported file formats:"
-        formatIndex = 1
-        for formartDesc in FILEFORMATS.values():
-            appDescription += "\n" + "(" + str(formatIndex) + ") " + formartDesc
-            formatIndex += 1
-            
-        appDescription += "\n\nFeatures"
-        appDescription += "\n1. Python doesn't include enough code pages, so it's added Java code pages as well."
-        appDescription += "\n   Java is implemented in javabridge module. If javabridge module is not installed, "
-        appDescription += "\n   Java functionlaity can be disabled changing JAVABRIDGEINCLUDED = True to False in Python code"
-    
-        parser = argparse.ArgumentParser(description=appDescription, 
-                                         epilog="Exit codes: 0 - successful completion, 1 - completion with any error",
-                                         formatter_class=RawTextHelpFormatter)
-        parser.add_argument("--inputfile", nargs=1, required=True, help="Input EBCDIC file path", metavar='"input file path"')
-        parser.add_argument("--outputfolder", nargs=1, required=True, help="Output folder to store delimited files", metavar='"output folder"')
-        parser.add_argument("--layoutfile", nargs=1, required=True, help="Layout file path", metavar='"layout file"')
-        parser.add_argument("--outputdelimiter", nargs="?", default=DELIMITER, help="output text file delimiter", metavar='delimiter')
-        parser.add_argument("--outputfileextension", nargs="?", default=OUTPUTFILEEXTENSION, help="output text file extension", metavar='extension')
-        parser.add_argument("--ignoreconversionerrors", nargs="?", default="yes" if IGNORECONVERSIONERRORS else "no", choices=["yes","no"], help="ignore any conversion error", metavar='yes/no')
-        parser.add_argument("--logfolder", nargs="?", default="", help="Output folder to store log file", metavar='log folder')
-        parser.add_argument("--pythonencoding", nargs="?", default="yes" if PYTHONENCODING else "no", choices=["yes","no"], help="use Python encoding rather than Java", metavar='yes/no')
-        parser.add_argument("--encodingname", nargs="?", default=INPUTENCODING, help="Code page name to encode characters (Python or Java)", metavar='encoding name')
-        parser.add_argument("--grouprecords", nargs="?", default="yes" if GROUPRECORDS else "no", choices=["yes","no"], help="create relationships between records", metavar='yes/no')
-        parser.add_argument("--grouprecordslevel2", nargs="?", default="yes" if GROUPRECORDSLEVEL2 else "no", choices=["yes","no"], help="create relationships between records for level 2", metavar='yes/no')
-        parser.add_argument("--verbose", nargs="?", default="yes" if VERBOSE else "no", choices=["yes","no"], help="show information on screen", metavar='yes/no')
-        parser.add_argument("--debug", nargs="?", default="yes" if DEBUG_MODE else "no", choices=["yes","no"], help="show debug information", metavar='yes/no')
-    
-        args = parser.parse_args()
-        wrongArgumentsFlag = False
         
-        # mandatory arguments########################################################
-        filePath = args.inputfile[0]
-        outputFolder = args.outputfolder[0]
-        layoutPath = args.layoutfile[0]
-        ##############################################################################
         
-        # optional arguments##########################################################
-        DELIMITER = args.outputdelimiter
-        OUTPUTFILEEXTENSION = args.outputfileextension
-        IGNORECONVERSIONERRORS = True if args.ignoreconversionerrors=="yes" else False
-        LOGFILEPATH = path.join(path.dirname(__file__) if args.logfolder=="" else args.logfolder, LOGFILENAME)
-        PYTHONENCODING = True if args.pythonencoding=="yes" else False
-        INPUTENCODING = args.encodingname
-        GROUPRECORDS = True if args.grouprecords=="yes" else False
-        GROUPRECORDSLEVEL2 = True if args.grouprecordslevel2=="yes" else False
-        VERBOSE = True if args.verbose=="yes" else False
-        DEBUG_MODE = True if args.debug=="yes" else False
-        ##############################################################################
+        filePath = inputFile
+        outputFolder 
+        layoutPath = layoutFile
+        
+        DELIMITER = outputDelimiter
+        OUTPUTFILEEXTENSION = outputFileExtension
+        IGNORECONVERSIONERRORS = ignoreConversionErrors
+        LOGFILEPATH = path.join(path.dirname(__file__) if logfolder=="" else logfolder, LOGFILENAME)
+        PYTHONENCODING = pythonEncoding
+        INPUTENCODING = encodingName
+        GROUPRECORDS = groupRecords
+        GROUPRECORDSLEVEL2 = groupRecordsLevel2
+        VERBOSE = verbose
+        DEBUG_MODE = debug
         
         sys.stdout = Logger(LOGFILEPATH, VERBOSE)
         
-        fileFolder = path.dirname(filePath)
         fileName, fileExtension  = path.splitext(path.basename(filePath))
-        
-        print("Application version:", __version__)
-        print("Stated:", datetime.datetime.now())
-        print("Parameters:")
-        print("-----------------------------------")
-        print("Data folder: " + fileFolder)
-        print("Output folder:", outputFolder)
-        print("Layout file: " + layoutPath)
-        print("Output delimiter:", r"\t" if DELIMITER=="\t" else DELIMITER)
-        print("Output file extension: " + OUTPUTFILEEXTENSION)
-        print("Ignore conversion errors:", args.ignoreconversionerrors)
-        print("Log file: " + LOGFILEPATH)
-        print("Python encoding: ", "yes" if PYTHONENCODING else "no")
-        print("Encoding name: " + INPUTENCODING)
-        print("Group records: ", "yes" if GROUPRECORDS else "no")
-        print("Group records level 2: ", "yes" if GROUPRECORDSLEVEL2 else "no")
-        print("Show information on screen:", args.verbose)
-        print("Show debug information:", args.debug)
         
         # conversion engine class
         dataConverter = DataConverter(PYTHONENCODING, INPUTENCODING)
@@ -627,10 +586,6 @@ if __name__=="__main__":
         if not layoutDefinition.loadLayouts(layoutPath):
             raise KnownIssue(layoutDefinition.errorDescription)
         
-        print("Format:", "(" + str(layoutDefinition.fileFormat) + ")", FILEFORMATS[layoutDefinition.fileFormat])
-        
-        print("-----------------------------------")
-        print()
         print("Processing file...", fileName + fileExtension)
         
         if(not PYTHONENCODING):
@@ -1058,4 +1013,125 @@ if __name__=="__main__":
         if dataConverter!=None:
             dataConverter.release()
                 
+        sys.exit(returnCode)
+
+if __name__=="__main__":
+
+    returnCode = 1
+    
+    # it will allow don't show print statemnet in finally of catch
+    wrongArgumentsFlag = True
+    
+    try:
+        appDescription = "Convert EBCDIC data into delimited text format. Version " + __version__
+        appDescription += "\n"
+        appDescription += "\nSupported file formats:"
+        formatIndex = 1
+        for formartDesc in FILEFORMATS.values():
+            appDescription += "\n" + "(" + str(formatIndex) + ") " + formartDesc
+            formatIndex += 1
+            
+        appDescription += "\n\nFeatures"
+        appDescription += "\n1. Python doesn't include enough code pages, so it's added Java code pages as well."
+        appDescription += "\n   Java is implemented in javabridge module. If javabridge module is not installed, "
+        appDescription += "\n   Java functionlaity can be disabled changing JAVABRIDGEINCLUDED = True to False in Python code"
+    
+        parser = argparse.ArgumentParser(description=appDescription, 
+                                         epilog="Exit codes: 0 - successful completion, 1 - completion with any error",
+                                         formatter_class=RawTextHelpFormatter)
+        parser.add_argument("--inputfile", nargs=1, required=True, help="Input EBCDIC file path", metavar='"input file path"')
+        parser.add_argument("--outputfolder", nargs=1, required=True, help="Output folder to store delimited files", metavar='"output folder"')
+        parser.add_argument("--layoutfile", nargs=1, required=True, help="Layout file path", metavar='"layout file"')
+        parser.add_argument("--outputdelimiter", nargs="?", default=DELIMITER, help="output text file delimiter", metavar='delimiter')
+        parser.add_argument("--outputfileextension", nargs="?", default=OUTPUTFILEEXTENSION, help="output text file extension", metavar='extension')
+        parser.add_argument("--ignoreconversionerrors", nargs="?", default="yes" if IGNORECONVERSIONERRORS else "no", choices=["yes","no"], help="ignore any conversion error", metavar='yes/no')
+        parser.add_argument("--logfolder", nargs="?", default="", help="Output folder to store log file", metavar='log folder')
+        parser.add_argument("--pythonencoding", nargs="?", default="yes" if PYTHONENCODING else "no", choices=["yes","no"], help="use Python encoding rather than Java", metavar='yes/no')
+        parser.add_argument("--encodingname", nargs="?", default=INPUTENCODING, help="Code page name to encode characters (Python or Java)", metavar='encoding name')
+        parser.add_argument("--grouprecords", nargs="?", default="yes" if GROUPRECORDS else "no", choices=["yes","no"], help="create relationships between records", metavar='yes/no')
+        parser.add_argument("--grouprecordslevel2", nargs="?", default="yes" if GROUPRECORDSLEVEL2 else "no", choices=["yes","no"], help="create relationships between records for level 2", metavar='yes/no')
+        parser.add_argument("--verbose", nargs="?", default="yes" if VERBOSE else "no", choices=["yes","no"], help="show information on screen", metavar='yes/no')
+        parser.add_argument("--debug", nargs="?", default="yes" if DEBUG_MODE else "no", choices=["yes","no"], help="show debug information", metavar='yes/no')
+    
+        args = parser.parse_args()
+        wrongArgumentsFlag = False
+        
+        currentFolder = Path(__file__).parent
+        
+        # mandatory arguments########################################################
+        filePath = (currentFolder / args.inputfile[0]).resolve()
+        outputFolder = (currentFolder / args.outputfolder[0]).resolve()
+        layoutPath = (currentFolder / args.layoutfile[0]).resolve()
+        ##############################################################################
+        
+        # optional arguments##########################################################
+        DELIMITER = args.outputdelimiter
+        OUTPUTFILEEXTENSION = args.outputfileextension
+        IGNORECONVERSIONERRORS = True if args.ignoreconversionerrors=="yes" else False
+        LOGFILEPATH = path.join(path.dirname(__file__) if args.logfolder=="" else args.logfolder, LOGFILENAME)
+        PYTHONENCODING = True if args.pythonencoding=="yes" else False
+        INPUTENCODING = args.encodingname
+        GROUPRECORDS = True if args.grouprecords=="yes" else False
+        GROUPRECORDSLEVEL2 = True if args.grouprecordslevel2=="yes" else False
+        VERBOSE = True if args.verbose=="yes" else False
+        DEBUG_MODE = True if args.debug=="yes" else False
+        ##############################################################################
+        
+        sys.stdout = Logger(LOGFILEPATH, VERBOSE)
+        
+        fileFolder = path.dirname(filePath)
+        fileName, fileExtension  = path.splitext(path.basename(filePath))
+        
+        print("Application version:", __version__)
+        print("Stated:", datetime.datetime.now())
+        print("Parameters:")
+        print("-----------------------------------")
+        print(f"Data folder: {fileFolder}")
+        print(f"Output folder: {outputFolder}")
+        print(f"Layout file: {layoutPath}")
+        print("Output delimiter:", r"\t" if DELIMITER=="\t" else DELIMITER)
+        print("Output file extension: " + OUTPUTFILEEXTENSION)
+        print("Ignore conversion errors:", args.ignoreconversionerrors)
+        print("Log file: " + LOGFILEPATH)
+        print("Python encoding: ", "yes" if PYTHONENCODING else "no")
+        print("Encoding name: " + INPUTENCODING)
+        print("Group records: ", "yes" if GROUPRECORDS else "no")
+        print("Group records level 2: ", "yes" if GROUPRECORDSLEVEL2 else "no")
+        print("Show information on screen:", args.verbose)
+        print("Show debug information:", args.debug)
+        
+        # layout definitions and other supplemental info
+        layoutDefinition = LayoutDefinition()
+    
+        if not layoutDefinition.loadLayouts(layoutPath):
+            raise KnownIssue(layoutDefinition.errorDescription)
+        
+        print("Format:", "(" + str(layoutDefinition.fileFormat) + ")", FILEFORMATS[layoutDefinition.fileFormat])
+        
+        print("-----------------------------------")
+        print()
+        
+        run(filePath, outputFolder, layoutPath, args.logfolder, PYTHONENCODING, INPUTENCODING, DELIMITER, OUTPUTFILEEXTENSION, IGNORECONVERSIONERRORS, GROUPRECORDS, GROUPRECORDSLEVEL2, VERBOSE, DEBUG_MODE)
+         
+    except KnownIssue as descr:
+        print(descr)
+            
+    except SystemExit:
+        #just used to catch system exit exception initiated by sys.exit()
+        pass
+        
+    except Exception as err:
+        error_class = err.__class__.__name__
+        detail = err.args[0]
+        cl, exc, tb = sys.exc_info()
+        line_number = traceback.extract_tb(tb)[-1][1]
+        print("Unexpected error: %s at line %d: %s"% (error_class, line_number, detail))
+        if not str(sys.exc_info()[1])==str(detail):
+            print(sys.exc_info()[1])
+        
+    finally:
+        
+        if(not wrongArgumentsFlag):
+            print("Completed:", datetime.datetime.now())
+        
         sys.exit(returnCode)

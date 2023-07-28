@@ -35,6 +35,8 @@ Conversion rules are a driver to parse EBCDIC data.
     
 * Debug mode to troubleshoot layouts
 
+* Pip package or command prompt usage
+
 ## Conversion rules sample
 Detailed information about conversion rules setup file can be found in [Engine Rules](https://github.com/larandvit/ebcdic-parser/blob/master/docs/engine_rules_manual.md) manual. [COBOL Engine Rules Dictionary](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md) manual describes how to convert COBOL data types into engine rules layout.
 ```json
@@ -69,14 +71,47 @@ Detailed information about conversion rules setup file can be found in [Engine R
 }
 ```
 
-## Installation
-It doesn't request any special installation if you are planning to use only Python encodings.
+## Pip Usage
 
-In case of using Java encodings, it has to be installed [javabridge](https://pypi.org/project/javabridge/) Python library. There is a constant in the code for including the javabridge library.
+### Installation
 
-## Usage
+```bash
+pip install ebcdic_parser
 ```
-usage: ebcdic_parser.py [-h] --inputfile "input file path" --outputfolder
+
+
+### Sample
+
+```python
+from ebcdic_parser_test.ebcdic_parser import run 
+
+
+run("../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat", 
+    "../tests/test_data/311_calls_for_service_requests_all_strings/output",
+    "../tests/layout_repository/311_calls_for_service_requests_all_strings.json",
+    outputDelimiter=',')
+```
+
+### Run Function Parameters
+
+* inputfile - input EBCDIC file path. Mandatory parameter.
+* outputfolder - output folder to store delimited files. Mandatory parameter.
+* layoutfile - layout file path. Mandatory parameter.
+* outputdelimiter - output text file delimiter. Optional parameter. Default value is `\t`.
+* outputfileextension - output text file extension. Optional parameter. Default value is `.txt`.
+* ignoreconversionerrors - ignore any conversion error. Optional parameter. Default value is `False`.
+* logfolder - output folder to store log file. Optional parameter. Default value is the current folder.
+* pythonencoding - use Python encoding rather than Java. Optional parameter. Default value is `True`.
+* encodingname - code page name to encode characters (Python or Java). Optional parameter. Default value is `cp037`.
+* grouprecords - create relationships between records. Optional parameter. Default value is `False'.
+* grouprecordslevel2 - create relationships between records for level 2. Optional parameter. Default value is `False`.
+* verbose - show extended information on screen. Optional parameter. Default value is `True`.
+* debug - show debug information. Optional parameter. Default value is `False`.
+
+
+## Command Prompt Usage
+```
+usage: convert.py [-h] --inputfile "input file path" --outputfolder
                         "output folder" --layoutfile "layout file"
                         [--outputdelimiter [delimiter]]
                         [--outputfileextension [extension]]
@@ -87,7 +122,7 @@ usage: ebcdic_parser.py [-h] --inputfile "input file path" --outputfolder
                         [--grouprecordslevel2 [yes/no]] [--verbose [yes/no]]
                         [--debug [yes/no]]
 
-Convert EBCDIC data into delimited text format. Version 2.3.0
+Convert EBCDIC data into delimited text format. Version x.x.x
 
 Supported file formats:
 (1) Single schema
@@ -130,11 +165,10 @@ optional arguments:
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```
 
-## Samples
 ### Single schema #1
 
 ```bash
-ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "./test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "./layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter ,
+convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "../../tests/test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "../../tests/layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter ,
 ```
 
 * Output location: ./test_data/311_calls_for_service_requests_all_strings/output
@@ -144,7 +178,7 @@ ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_str
 ### Single schema in debug mode #1
 
 ```bash
-ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "./test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "./layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter , --debug yes
+convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "../../tests/test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "../../tests/layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter , --debug yes
 ```
 
 * Output location: ./test_data/311_calls_for_service_requests_all_strings/output
@@ -154,32 +188,32 @@ ebcdic_parser.py --inputfile "./test_data/311_calls_for_service_requests_all_str
 ### Single schema #2
 
 ```bash
-ebcdic_parser.py --inputfile "./test_data/pr_p1_p2_gas_disposition/gsf102.ebc" --outputfolder "./test_data/pr_p1_p2_gas_disposition/output" --layoutfile "./layout_repository/gsf102_rules.json" --logfolder "./test_data/pr_p1_p2_gas_disposition/log"
+convert.py --inputfile "../../tests/test_data/pr_p1_p2_gas_disposition/gsf102.ebc" --outputfolder "../../tests/test_data/pr_p1_p2_gas_disposition/output" --layoutfile "../../tests/layout_repository/gsf102_rules.json"
 ```
 
 * Output location: ./test_data/pr_p1_p2_gas_disposition/output
 * Outptut format: tab delimited ASCII file
-* Log folder: ./test_data/pr_p1_p2_gas_disposition/log
+* Log folder: ./ebcdic_parser.log
 
 ### Multi-schema fixed record length
 
 ```bash
-ebcdic_parser.py --inputfile "./test_data/ola013k/olf001l.ebc" --outputfolder "./test_data/ola013k/output" --layoutfile "./layout_repository/ola013k_rules.json" --logfolder "./test_data/ola013k/log"
+convert.py --inputfile "../../tests/test_data/ola013k/olf001l.ebc" --outputfolder "../../tests/test_data/ola013k/output" --layoutfile "../../tests/layout_repository/ola013k_rules.json"
 ```
 
 * Output location: ./test_data/ola013k/output
 * Outptut format: tab delimited ASCII file
-* Log folder: ./test_data/ola013k/log
+* Log folder: ./ebcdic_parser.log
 
 ### Single schema variable record length
 
 ```bash
-ebcdic_parser.py --inputfile "./test_data/service_segment_data/RG197.SERVSEG.Y70.ebc" --outputfolder "./test_data/service_segment_data/output" --layoutfile "./layout_repository/service_segment_data.json" --logfolder "./test_data/service_segment_data/log"
+convert.py --inputfile "../../tests/test_data/service_segment_data/RG197.SERVSEG.Y70.ebc" --outputfolder "../../tests/test_data/service_segment_data/output" --layoutfile "../../tests/layout_repository/service_segment_data.json"
 ```
 
 * Output location: ./test_data/service_segment_data/output
 * Outptut format: tab delimited ASCII file
-* Log folder: ./test_data/service_segment_data/log
+* Log folder: ./ebcdic_parser.log
 
 ## Testing
 ### Functional tests
@@ -198,6 +232,11 @@ converter_to_ebcdic.py
 ```
 test_system_311_calls_for_service_requests_all_strings.py
 ```
+
+## Java Encodings
+It doesn't request any special installation if you are planning to use only Python encodings.
+
+In case of using Java encodings, it has to be installed [javabridge](https://pypi.org/project/javabridge/) Python library. There is a constant in the code for including the javabridge library.
 
 ## Contributing
 Please read [CONTRIBUTING.md](https://github.com/larandvit/ebcdic-parser/blob/master/CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
