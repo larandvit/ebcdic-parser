@@ -13,12 +13,12 @@ Conversion rules are a driver to parse EBCDIC data.
 
 * Supported layouts
     1. Single schema
-       * Original [COBOL layout](test_data/pr_p1_p2_gas_disposition/oga0861.pdf) and corresponding [conversion rules](layout_repository/gsf102_rules.json) file
+       * Original [COBOL layout](https://github.com/larandvit/ebcdic-parser/blob/master/tests/test_data/pr_p1_p2_gas_disposition/oga0861.pdf) and corresponding [conversion rules](https://github.com/larandvit/ebcdic-parser/blob/master/tests/layout_repository/gsf102_rules.json) file
     2. Multi-schema fixed record length
-       * Original [COBOL layout](test_data/ola013k/ola013k.pdf) and corresponding [conversion rules](layout_repository/ola013k_rules.json) file
+       * Original [COBOL layout](https://github.com/larandvit/ebcdic-parser/blob/master/tests/test_data/ola013k/ola013k.pdf) and corresponding [conversion rules](https://github.com/larandvit/ebcdic-parser/blob/master/tests/layout_repository/ola013k_rules.json) file
     3. Multi-schema variable record length
     4. Single schema variable record length
-       * Original [COBOL layout](test_data/service_segment_data/129.1DP.pdf) and corresponding [conversion rules](layout_repository/service_segment_data.json) file
+       * Original [COBOL layout](https://github.com/larandvit/ebcdic-parser/blob/master/tests/test_data/service_segment_data/129.1DP.pdf) and corresponding [conversion rules](https://github.com/larandvit/ebcdic-parser/blob/master/tests/layout_repository/service_segment_data.json) file
  
 * Fixing anomalies in EBCDIC files
     1. Skip header
@@ -79,7 +79,6 @@ Detailed information about conversion rules setup file can be found in [Engine R
 pip install ebcdic_parser
 ```
 
-
 ### Sample
 
 ```python
@@ -92,21 +91,40 @@ run("../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for
     outputDelimiter=',')
 ```
 
-### Run Function Parameters
+### Run Function
 
-* inputfile - input EBCDIC file path. Mandatory parameter.
-* outputfolder - output folder to store delimited files. Mandatory parameter.
-* layoutfile - layout file path. Mandatory parameter.
-* outputdelimiter - output text file delimiter. Optional parameter. Default value is `\t`.
-* outputfileextension - output text file extension. Optional parameter. Default value is `.txt`.
-* ignoreconversionerrors - ignore any conversion error. Optional parameter. Default value is `False`.
-* logfolder - output folder to store log file. Optional parameter. Default value is the current folder.
-* pythonencoding - use Python encoding rather than Java. Optional parameter. Default value is `True`.
-* encodingname - code page name to encode characters (Python or Java). Optional parameter. Default value is `cp037`.
-* grouprecords - create relationships between records. Optional parameter. Default value is `False'.
-* grouprecordslevel2 - create relationships between records for level 2. Optional parameter. Default value is `False`.
-* verbose - show extended information on screen. Optional parameter. Default value is `True`.
-* debug - show debug information. Optional parameter. Default value is `False`.
+```
+run(inputFile, 
+    outputFolder,
+    layoutFile,
+    logfolder='',
+    pythonEncoding=True,
+    encodingName='cp037',
+    outputDelimiter=`\t`,
+    outputFileExtension=`.txt`,
+    ignoreConversionErrors=False,
+    groupRecords=False,
+    groupRecordsLevel2=False,
+    verbose=True,
+    debug=False,
+    cliMode=False):
+```
+
+
+* **inputfile** - input EBCDIC file path. Mandatory parameter. Absolute and relative paths are acceptable.
+* **outputfolder** - output folder to store delimited files. Mandatory parameter. Absolute and relative paths are acceptable.
+* **layoutfile** - layout file path. Mandatory parameter. Absolute and relative paths are acceptable.
+* **outputdelimiter** - output text file delimiter. Optional parameter. Default value is `\t`.
+* **outputfileextension** - output text file extension. Optional parameter. Default value is `.txt`.
+* **ignoreconversionerrors** - ignore any conversion error. Optional parameter. Default value is `False`.
+* **logfolder** - output folder to store log file. Optional parameter. Default value is the current folder. Absolute and relative paths are acceptable.
+* **pythonencoding** - use Python encoding rather than Java. Optional parameter. Default value is `True`.
+* **encodingname** - code page name to encode characters (Python or Java). Optional parameter. Default value is `cp037`.
+* **grouprecords** - create relationships between records. Optional parameter. Default value is `False'.
+* **grouprecordslevel2** - create relationships between records for level 2. Optional parameter. Default value is `False`.
+* **verbose** - show extended information on screen. Optional parameter. Default value is `True`.
+* **debug** - show debug information. Optional parameter. Default value is `False`.
+* **cliMode** - a flag how it run in command prompt or Pip installation.  
 
 
 ## Command Prompt Usage
@@ -171,7 +189,7 @@ Exit codes: 0 - successful completion, 1 - completion with any error
 convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "../../tests/test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "../../tests/layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter ,
 ```
 
-* Output location: ./test_data/311_calls_for_service_requests_all_strings/output
+* Output location: ./tests/test_data/311_calls_for_service_requests_all_strings/output
 * Outptut format: comma delimited ASCII file
 * Log file: ./ebcdic_parser.log
 
@@ -181,19 +199,19 @@ convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all
 convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "../../tests/test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "../../tests/layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter , --debug yes
 ```
 
-* Output location: ./test_data/311_calls_for_service_requests_all_strings/output
+* Output location: ./tests/tests/test_data/311_calls_for_service_requests_all_strings/output
 * Outptut format: comma delimited ASCII file
 * Log file: ./ebcdic_parser.log
 
 ### Single schema #2
 
 ```bash
-convert.py --inputfile "../../tests/test_data/pr_p1_p2_gas_disposition/gsf102.ebc" --outputfolder "../../tests/test_data/pr_p1_p2_gas_disposition/output" --layoutfile "../../tests/layout_repository/gsf102_rules.json"
+convert.py --inputfile "../../tests/test_data/pr_p1_p2_gas_disposition/gsf102.ebc" --outputfolder "../../tests/test_data/pr_p1_p2_gas_disposition/output" --layoutfile "../../tests/layout_repository/gsf102_rules.json" --logfolder "../../tests/test_data/pr_p1_p2_gas_disposition/log"
 ```
 
-* Output location: ./test_data/pr_p1_p2_gas_disposition/output
+* Output location: ./tests/test_data/pr_p1_p2_gas_disposition/output
 * Outptut format: tab delimited ASCII file
-* Log folder: ./ebcdic_parser.log
+* Log folder: ./tests/test_data/pr_p1_p2_gas_disposition/log/ebcdic_parser.log
 
 ### Multi-schema fixed record length
 
@@ -201,7 +219,7 @@ convert.py --inputfile "../../tests/test_data/pr_p1_p2_gas_disposition/gsf102.eb
 convert.py --inputfile "../../tests/test_data/ola013k/olf001l.ebc" --outputfolder "../../tests/test_data/ola013k/output" --layoutfile "../../tests/layout_repository/ola013k_rules.json"
 ```
 
-* Output location: ./test_data/ola013k/output
+* Output location: ./tests/test_data/ola013k/output
 * Outptut format: tab delimited ASCII file
 * Log folder: ./ebcdic_parser.log
 
@@ -211,7 +229,7 @@ convert.py --inputfile "../../tests/test_data/ola013k/olf001l.ebc" --outputfolde
 convert.py --inputfile "../../tests/test_data/service_segment_data/RG197.SERVSEG.Y70.ebc" --outputfolder "../../tests/test_data/service_segment_data/output" --layoutfile "../../tests/layout_repository/service_segment_data.json"
 ```
 
-* Output location: ./test_data/service_segment_data/output
+* Output location: ./tests/test_data/service_segment_data/output
 * Outptut format: tab delimited ASCII file
 * Log folder: ./ebcdic_parser.log
 

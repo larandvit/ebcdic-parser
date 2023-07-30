@@ -38,7 +38,7 @@ import unicodedata
 __author__ = "Vitaly Saversky"
 __date__ = "2017-10-04"
 __credits__ = ["Vitaly Saversky"]
-__version__ = "3.0.0"
+__version__ = "3.1.0"
 __maintainer__ = "Vitaly Saversky"
 __email__ = "larandvit@hotmail.com"
 __status__ = "Production"
@@ -528,6 +528,14 @@ def convert_error_message(recordLayoutType, field, fieldBytes, catchedError):
 def show_bytes(record):
     return [hex(num) for num in record]
 
+def current_folder():
+    return Path(__file__).parent
+
+def log_path(logFolder):
+    logFolder = str(logFolder)
+    logFilePath = path.join(path.dirname(__file__) if logFolder=="" else (current_folder() /logFolder).resolve(), LOGFILENAME)
+    return logFilePath
+
 def run(inputFile, 
         outputFolder,
         layoutFile,
@@ -540,7 +548,8 @@ def run(inputFile,
         groupRecords=GROUPRECORDS,
         groupRecordsLevel2=GROUPRECORDSLEVEL2,
         verbose=VERBOSE,
-        debug=DEBUG_MODE):
+        debug=DEBUG_MODE,
+        cliMode=False):
     
     returnCode = 1
     
@@ -565,7 +574,7 @@ def run(inputFile,
         DELIMITER = outputDelimiter
         OUTPUTFILEEXTENSION = outputFileExtension
         IGNORECONVERSIONERRORS = ignoreConversionErrors
-        LOGFILEPATH = path.join(path.dirname(__file__) if logfolder=="" else logfolder, LOGFILENAME)
+        LOGFILEPATH = log_path(logfolder)
         PYTHONENCODING = pythonEncoding
         INPUTENCODING = encodingName
         GROUPRECORDS = groupRecords
@@ -573,7 +582,8 @@ def run(inputFile,
         VERBOSE = verbose
         DEBUG_MODE = debug
         
-        sys.stdout = Logger(LOGFILEPATH, VERBOSE)
+        if not cliMode:
+            sys.stdout = Logger(LOGFILEPATH, VERBOSE)
         
         fileName, fileExtension  = path.splitext(path.basename(filePath))
         
@@ -1056,19 +1066,17 @@ if __name__=="__main__":
         args = parser.parse_args()
         wrongArgumentsFlag = False
         
-        currentFolder = Path(__file__).parent
-        
         # mandatory arguments########################################################
-        filePath = (currentFolder / args.inputfile[0]).resolve()
-        outputFolder = (currentFolder / args.outputfolder[0]).resolve()
-        layoutPath = (currentFolder / args.layoutfile[0]).resolve()
+        filePath = (current_folder() / args.inputfile[0]).resolve()
+        outputFolder = (current_folder() / args.outputfolder[0]).resolve()
+        layoutPath = (current_folder() / args.layoutfile[0]).resolve()
         ##############################################################################
         
         # optional arguments##########################################################
         DELIMITER = args.outputdelimiter
         OUTPUTFILEEXTENSION = args.outputfileextension
         IGNORECONVERSIONERRORS = True if args.ignoreconversionerrors=="yes" else False
-        LOGFILEPATH = path.join(path.dirname(__file__) if args.logfolder=="" else args.logfolder, LOGFILENAME)
+        LOGFILEPATH = log_path(args.logfolder)
         PYTHONENCODING = True if args.pythonencoding=="yes" else False
         INPUTENCODING = args.encodingname
         GROUPRECORDS = True if args.grouprecords=="yes" else False
@@ -1078,10 +1086,10 @@ if __name__=="__main__":
         ##############################################################################
         
         sys.stdout = Logger(LOGFILEPATH, VERBOSE)
-        
         fileFolder = path.dirname(filePath)
         fileName, fileExtension  = path.splitext(path.basename(filePath))
         
+        print()
         print("Application version:", __version__)
         print("Stated:", datetime.datetime.now())
         print("Parameters:")
@@ -1111,7 +1119,20 @@ if __name__=="__main__":
         print("-----------------------------------")
         print()
         
-        run(filePath, outputFolder, layoutPath, args.logfolder, PYTHONENCODING, INPUTENCODING, DELIMITER, OUTPUTFILEEXTENSION, IGNORECONVERSIONERRORS, GROUPRECORDS, GROUPRECORDSLEVEL2, VERBOSE, DEBUG_MODE)
+        run(filePath, 
+            outputFolder, 
+            layoutPath, 
+            args.logfolder, 
+            PYTHONENCODING, 
+            INPUTENCODING, 
+            DELIMITER, 
+            OUTPUTFILEEXTENSION, 
+            IGNORECONVERSIONERRORS, 
+            GROUPRECORDS, 
+            GROUPRECORDSLEVEL2, 
+            VERBOSE, 
+            DEBUG_MODE,
+            cliMode=True)
          
     except KnownIssue as descr:
         print(descr)
