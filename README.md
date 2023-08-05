@@ -35,7 +35,10 @@ Conversion rules are a driver to parse EBCDIC data.
     
 * Debug mode to troubleshoot layouts
 
-* Pip package or command prompt usage
+* Run the tool
+  1. Pip package 
+  2. Command prompt
+  3. python -m ebcdic_parser
 
 ## Conversion rules sample
 Detailed information about conversion rules setup file can be found in [Engine Rules](https://github.com/larandvit/ebcdic-parser/blob/master/docs/engine_rules_manual.md) manual. [COBOL Engine Rules Dictionary](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md) manual describes how to convert COBOL data types into engine rules layout.
@@ -85,10 +88,11 @@ pip install ebcdic_parser
 from ebcdic_parser.convert import run 
 
 
-run("../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat", 
-    "../tests/test_data/311_calls_for_service_requests_all_strings/output",
-    "../tests/layout_repository/311_calls_for_service_requests_all_strings.json",
-    outputDelimiter=',')
+run(r"D:\Projects\ebcdic-parser\tests\test_data\311_calls_for_service_requests_all_strings\311_calls_for_service_requests_sample.dat", 
+     r"D:\Projects\test_project",
+     r"D:\Projects\ebcdic-parser\tests\layout_repository\311_calls_for_service_requests_all_strings.json",
+     outputDelimiter=',',
+     logfolder=r'D:\Projects\test_project\log')
 ```
 
 ### Run Function
@@ -232,6 +236,12 @@ convert.py --inputfile "../../tests/test_data/service_segment_data/RG197.SERVSEG
 * Output location: ./tests/test_data/service_segment_data/output
 * Outptut format: tab delimited ASCII file
 * Log folder: ./ebcdic_parser.log
+
+## python -m ebcdic_parser Usage
+
+```bash
+python -m ebcdic_parser --inputfile "D:\Projects\ebcdic-parser\tests\test_data\311_calls_for_service_requests_all_strings\311_calls_for_service_requests_sample.dat" --outputfolder "D:\Projects\test_project" --layoutfile "D:\Projects\ebcdic-parser\tests\layout_repository\311_calls_for_service_requests_all_strings.json"  --outputdelimiter "," --logfolder "D:\Projects\test_project\log"
+```
 
 ## Testing
 ### Functional tests

@@ -38,7 +38,7 @@ import unicodedata
 __author__ = "Vitaly Saversky"
 __date__ = "2017-10-04"
 __credits__ = ["Vitaly Saversky"]
-__version__ = "3.1.0"
+__version__ = "3.2.0"
 __maintainer__ = "Vitaly Saversky"
 __email__ = "larandvit@hotmail.com"
 __status__ = "Production"
@@ -49,22 +49,35 @@ class FileFormat(IntEnum):
     MultiSchemaVariable = 3
     SingleSchemaVariable = 4
     
+class ParameterDefaults:
+    DELIMITER = "\t"
+    OUTPUTFILEEXTENSION = ".txt"
+    IGNORECONVERSIONERRORS = False
+    VERBOSE = True
+    GROUPRECORDS = False
+    GROUPRECORDSLEVEL2 = False
+    DEBUG_MODE = False
+
+    PYTHONENCODING = True
+    INPUTENCODING = "cp037"
+    OUTPUTENCODING = "utf_8"
+    
 NEWLINE = "\n"
 LOGFILENAME = "ebcdic_parser.log"
 
 SKIPFIELDTYPENAME = 'skip'
 
-DELIMITER = "\t"
-OUTPUTFILEEXTENSION = ".txt"
-IGNORECONVERSIONERRORS = False
-VERBOSE = True
-GROUPRECORDS = False
-GROUPRECORDSLEVEL2 = False
-DEBUG_MODE = False
+DELIMITER = ParameterDefaults.DELIMITER
+OUTPUTFILEEXTENSION = ParameterDefaults.OUTPUTFILEEXTENSION
+IGNORECONVERSIONERRORS = ParameterDefaults.IGNORECONVERSIONERRORS
+VERBOSE = ParameterDefaults.VERBOSE
+GROUPRECORDS = ParameterDefaults.GROUPRECORDS
+GROUPRECORDSLEVEL2 = ParameterDefaults.GROUPRECORDSLEVEL2
+DEBUG_MODE = ParameterDefaults.DEBUG_MODE
 
-PYTHONENCODING = True
-INPUTENCODING = "cp037"
-OUTPUTENCODING = "utf_8"
+PYTHONENCODING = ParameterDefaults.PYTHONENCODING
+INPUTENCODING = ParameterDefaults.INPUTENCODING
+OUTPUTENCODING = ParameterDefaults.OUTPUTENCODING
 
 LAYOUTELEMENT_DESCRIPTION = "description"
 LAYOUTELEMENT_KEYFIELDS = "keyfields"
@@ -1025,8 +1038,7 @@ def run(inputFile,
                 
         sys.exit(returnCode)
 
-if __name__=="__main__":
-
+def main():
     returnCode = 1
     
     # it will allow don't show print statemnet in finally of catch
@@ -1052,16 +1064,16 @@ if __name__=="__main__":
         parser.add_argument("--inputfile", nargs=1, required=True, help="Input EBCDIC file path", metavar='"input file path"')
         parser.add_argument("--outputfolder", nargs=1, required=True, help="Output folder to store delimited files", metavar='"output folder"')
         parser.add_argument("--layoutfile", nargs=1, required=True, help="Layout file path", metavar='"layout file"')
-        parser.add_argument("--outputdelimiter", nargs="?", default=DELIMITER, help="output text file delimiter", metavar='delimiter')
-        parser.add_argument("--outputfileextension", nargs="?", default=OUTPUTFILEEXTENSION, help="output text file extension", metavar='extension')
-        parser.add_argument("--ignoreconversionerrors", nargs="?", default="yes" if IGNORECONVERSIONERRORS else "no", choices=["yes","no"], help="ignore any conversion error", metavar='yes/no')
+        parser.add_argument("--outputdelimiter", nargs="?", default=ParameterDefaults.DELIMITER, help="output text file delimiter", metavar='delimiter')
+        parser.add_argument("--outputfileextension", nargs="?", default=ParameterDefaults.OUTPUTFILEEXTENSION, help="output text file extension", metavar='extension')
+        parser.add_argument("--ignoreconversionerrors", nargs="?", default="yes" if ParameterDefaults.IGNORECONVERSIONERRORS else "no", choices=["yes","no"], help="ignore any conversion error", metavar='yes/no')
         parser.add_argument("--logfolder", nargs="?", default="", help="Output folder to store log file", metavar='log folder')
-        parser.add_argument("--pythonencoding", nargs="?", default="yes" if PYTHONENCODING else "no", choices=["yes","no"], help="use Python encoding rather than Java", metavar='yes/no')
-        parser.add_argument("--encodingname", nargs="?", default=INPUTENCODING, help="Code page name to encode characters (Python or Java)", metavar='encoding name')
-        parser.add_argument("--grouprecords", nargs="?", default="yes" if GROUPRECORDS else "no", choices=["yes","no"], help="create relationships between records", metavar='yes/no')
-        parser.add_argument("--grouprecordslevel2", nargs="?", default="yes" if GROUPRECORDSLEVEL2 else "no", choices=["yes","no"], help="create relationships between records for level 2", metavar='yes/no')
-        parser.add_argument("--verbose", nargs="?", default="yes" if VERBOSE else "no", choices=["yes","no"], help="show information on screen", metavar='yes/no')
-        parser.add_argument("--debug", nargs="?", default="yes" if DEBUG_MODE else "no", choices=["yes","no"], help="show debug information", metavar='yes/no')
+        parser.add_argument("--pythonencoding", nargs="?", default="yes" if ParameterDefaults.PYTHONENCODING else "no", choices=["yes","no"], help="use Python encoding rather than Java", metavar='yes/no')
+        parser.add_argument("--encodingname", nargs="?", default=ParameterDefaults.INPUTENCODING, help="Code page name to encode characters (Python or Java)", metavar='encoding name')
+        parser.add_argument("--grouprecords", nargs="?", default="yes" if ParameterDefaults.GROUPRECORDS else "no", choices=["yes","no"], help="create relationships between records", metavar='yes/no')
+        parser.add_argument("--grouprecordslevel2", nargs="?", default="yes" if ParameterDefaults.GROUPRECORDSLEVEL2 else "no", choices=["yes","no"], help="create relationships between records for level 2", metavar='yes/no')
+        parser.add_argument("--verbose", nargs="?", default="yes" if ParameterDefaults.VERBOSE else "no", choices=["yes","no"], help="show information on screen", metavar='yes/no')
+        parser.add_argument("--debug", nargs="?", default="yes" if ParameterDefaults.DEBUG_MODE else "no", choices=["yes","no"], help="show debug information", metavar='yes/no')
     
         args = parser.parse_args()
         wrongArgumentsFlag = False
@@ -1087,7 +1099,6 @@ if __name__=="__main__":
         
         sys.stdout = Logger(LOGFILEPATH, VERBOSE)
         fileFolder = path.dirname(filePath)
-        fileName, fileExtension  = path.splitext(path.basename(filePath))
         
         print()
         print("Application version:", __version__)
@@ -1156,3 +1167,7 @@ if __name__=="__main__":
             print("Completed:", datetime.datetime.now())
         
         sys.exit(returnCode)
+
+if __name__=="__main__":
+
+    main()
