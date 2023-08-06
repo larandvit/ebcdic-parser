@@ -124,7 +124,7 @@ run(inputFile,
 * **logfolder** - output folder to store log file. Optional parameter. Default value is the current folder. Absolute and relative paths are acceptable.
 * **pythonencoding** - use Python encoding rather than Java. Optional parameter. Default value is `True`.
 * **encodingname** - code page name to encode characters (Python or Java). Optional parameter. Default value is `cp037`.
-* **grouprecords** - create relationships between records. Optional parameter. Default value is `False'.
+* **grouprecords** - create relationships between records. Optional parameter. Default value is `False`.
 * **grouprecordslevel2** - create relationships between records for level 2. Optional parameter. Default value is `False`.
 * **verbose** - show extended information on screen. Optional parameter. Default value is `True`.
 * **debug** - show debug information. Optional parameter. Default value is `False`.
