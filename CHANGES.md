@@ -1,5 +1,9 @@
 # Release Notes
 
+## Release 3.2.2
+* Automate version management.
+* Add CHANGES.md documentation.
+
 ## Release 3.2.1
 * Added dedicated PyPI README file.
 * Refined documentation.
