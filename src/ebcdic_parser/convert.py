@@ -1036,7 +1036,7 @@ def run(inputFile,
         if dataConverter!=None:
             dataConverter.release()
                 
-        sys.exit(returnCode)
+        return returnCode
 
 def main():
     returnCode = 1
@@ -1129,21 +1129,21 @@ def main():
         
         print("-----------------------------------")
         print()
-        
-        run(filePath, 
-            outputFolder, 
-            layoutPath, 
-            args.logfolder, 
-            PYTHONENCODING, 
-            INPUTENCODING, 
-            DELIMITER, 
-            OUTPUTFILEEXTENSION, 
-            IGNORECONVERSIONERRORS, 
-            GROUPRECORDS, 
-            GROUPRECORDSLEVEL2, 
-            VERBOSE, 
-            DEBUG_MODE,
-            cliMode=True)
+
+        returnCode = run(filePath,
+                         outputFolder,
+                         layoutPath,
+                         args.logfolder,
+                         PYTHONENCODING,
+                         INPUTENCODING,
+                         DELIMITER,
+                         OUTPUTFILEEXTENSION,
+                         IGNORECONVERSIONERRORS,
+                         GROUPRECORDS,
+                         GROUPRECORDSLEVEL2,
+                         VERBOSE,
+                         DEBUG_MODE,
+                         cliMode=True)
          
     except KnownIssue as descr:
         print(descr)
