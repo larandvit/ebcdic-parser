@@ -47,31 +47,32 @@ pip install ebcdic_parser
 ```python
 from ebcdic_parser.convert import run 
 
+returnCode=run(r"D:\Projects\ebcdic-parser\tests\test_data\311_calls_for_service_requests_all_strings\311_calls_for_service_requests_sample.dat", 
+               r"D:\Projects\test_project",
+               r"D:\Projects\ebcdic-parser\tests\layout_repository\311_calls_for_service_requests_all_strings.json",
+               outputDelimiter=',',
+               logfolder=r'D:\Projects\test_project\log')
 
-run(r"D:\Projects\ebcdic-parser\tests\test_data\311_calls_for_service_requests_all_strings\311_calls_for_service_requests_sample.dat", 
-     r"D:\Projects\test_project",
-     r"D:\Projects\ebcdic-parser\tests\layout_repository\311_calls_for_service_requests_all_strings.json",
-     outputDelimiter=',',
-     logfolder=r'D:\Projects\test_project\log')
+print(returnCode)
 ```
 
 ### Run Function
 
 ```
-run(inputFile, 
-    outputFolder,
-    layoutFile,
-    logfolder='',
-    pythonEncoding=True,
-    encodingName='cp037',
-    outputDelimiter=`\t`,
-    outputFileExtension=`.txt`,
-    ignoreConversionErrors=False,
-    groupRecords=False,
-    groupRecordsLevel2=False,
-    verbose=True,
-    debug=False,
-    cliMode=False):
+returnCode=run(inputFile, 
+               outputFolder,
+               layoutFile,
+               logfolder='',
+               pythonEncoding=True,
+               encodingName='cp037',
+               outputDelimiter=`\t`,
+               outputFileExtension=`.txt`,
+               ignoreConversionErrors=False,
+               groupRecords=False,
+               groupRecordsLevel2=False,
+               verbose=True,
+               debug=False,
+               cliMode=False)
 ```
 
 
@@ -90,10 +91,14 @@ run(inputFile,
 * **debug** - show debug information. Optional parameter. Default value is `False`.
 * **cliMode** - a flag how it run in command prompt or Pip installation.
 
+* **returnCode** - exit codes: 0 - successful completion, 1 - completion with any error
+
 ## python -m ebcdic_parser Usage
 
 ```bash
 python -m ebcdic_parser --inputfile "D:\Projects\ebcdic-parser\tests\test_data\311_calls_for_service_requests_all_strings\311_calls_for_service_requests_sample.dat" --outputfolder "D:\Projects\test_project" --layoutfile "D:\Projects\ebcdic-parser\tests\layout_repository\311_calls_for_service_requests_all_strings.json"  --outputdelimiter "," --logfolder "D:\Projects\test_project\log"
+
+echo %ERRORLEVEL%
 ```
 
 ### Arguments

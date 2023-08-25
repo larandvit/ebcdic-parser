@@ -38,7 +38,7 @@ import unicodedata
 __author__ = "Vitaly Saversky"
 __date__ = "2017-10-04"
 __credits__ = ["Vitaly Saversky"]
-__version__ = "3.2.2"
+__version__ = "3.3.0"
 __maintainer__ = "Vitaly Saversky"
 __email__ = "larandvit@hotmail.com"
 __status__ = "Production"
@@ -1166,6 +1166,7 @@ def main():
         if(not wrongArgumentsFlag):
             print("Completed:", datetime.datetime.now())
         
+        sys.stdout = sys.__stdout__
         sys.exit(returnCode)
 
 if __name__=="__main__":

@@ -87,31 +87,32 @@ pip install ebcdic_parser
 ```python
 from ebcdic_parser.convert import run 
 
-
-run(r"D:\Projects\ebcdic-parser\tests\test_data\311_calls_for_service_requests_all_strings\311_calls_for_service_requests_sample.dat", 
-     r"D:\Projects\test_project",
-     r"D:\Projects\ebcdic-parser\tests\layout_repository\311_calls_for_service_requests_all_strings.json",
-     outputDelimiter=',',
-     logfolder=r'D:\Projects\test_project\log')
+returnCode=run(r"D:\Projects\ebcdic-parser\tests\test_data\311_calls_for_service_requests_all_strings\311_calls_for_service_requests_sample.dat", 
+               r"D:\Projects\test_project",
+               r"D:\Projects\ebcdic-parser\tests\layout_repository\311_calls_for_service_requests_all_strings.json",
+               outputDelimiter=',',
+               logfolder=r'D:\Projects\test_project\log')
+               
+print(returnCode)
 ```
 
 ### Run Function
 
 ```
-run(inputFile, 
-    outputFolder,
-    layoutFile,
-    logfolder='',
-    pythonEncoding=True,
-    encodingName='cp037',
-    outputDelimiter=`\t`,
-    outputFileExtension=`.txt`,
-    ignoreConversionErrors=False,
-    groupRecords=False,
-    groupRecordsLevel2=False,
-    verbose=True,
-    debug=False,
-    cliMode=False):
+returnCode=run(inputFile, 
+               outputFolder,
+               layoutFile,
+               logfolder='',
+               pythonEncoding=True,
+               encodingName='cp037',
+               outputDelimiter=`\t`,
+               outputFileExtension=`.txt`,
+               ignoreConversionErrors=False,
+               groupRecords=False,
+               groupRecordsLevel2=False,
+               verbose=True,
+               debug=False,
+               cliMode=False)
 ```
 
 
@@ -129,6 +130,8 @@ run(inputFile,
 * **verbose** - show extended information on screen. Optional parameter. Default value is `True`.
 * **debug** - show debug information. Optional parameter. Default value is `False`.
 * **cliMode** - a flag how it run in command prompt or Pip installation.  
+
+* **returnCode** - exit codes: 0 - successful completion, 1 - completion with any error
 
 
 ## Command Prompt Usage
@@ -191,6 +194,8 @@ Exit codes: 0 - successful completion, 1 - completion with any error
 
 ```bash
 convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "../../tests/test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "../../tests/layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter ,
+
+echo %ERRORLEVEL%
 ```
 
 * Output location: ./tests/test_data/311_calls_for_service_requests_all_strings/output
@@ -201,6 +206,8 @@ convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all
 
 ```bash
 convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all_strings/311_calls_for_service_requests_sample.dat" --outputfolder "../../tests/test_data/311_calls_for_service_requests_all_strings/output" --layoutfile "../../tests/layout_repository/311_calls_for_service_requests_all_strings.json" --outputdelimiter , --debug yes
+
+echo %ERRORLEVEL%
 ```
 
 * Output location: ./tests/tests/test_data/311_calls_for_service_requests_all_strings/output
@@ -211,6 +218,8 @@ convert.py --inputfile "../../tests/test_data/311_calls_for_service_requests_all
 
 ```bash
 convert.py --inputfile "../../tests/test_data/pr_p1_p2_gas_disposition/gsf102.ebc" --outputfolder "../../tests/test_data/pr_p1_p2_gas_disposition/output" --layoutfile "../../tests/layout_repository/gsf102_rules.json" --logfolder "../../tests/test_data/pr_p1_p2_gas_disposition/log"
+
+echo %ERRORLEVEL%
 ```
 
 * Output location: ./tests/test_data/pr_p1_p2_gas_disposition/output
@@ -221,6 +230,8 @@ convert.py --inputfile "../../tests/test_data/pr_p1_p2_gas_disposition/gsf102.eb
 
 ```bash
 convert.py --inputfile "../../tests/test_data/ola013k/olf001l.ebc" --outputfolder "../../tests/test_data/ola013k/output" --layoutfile "../../tests/layout_repository/ola013k_rules.json"
+
+echo %ERRORLEVEL%
 ```
 
 * Output location: ./tests/test_data/ola013k/output
@@ -231,6 +242,8 @@ convert.py --inputfile "../../tests/test_data/ola013k/olf001l.ebc" --outputfolde
 
 ```bash
 convert.py --inputfile "../../tests/test_data/service_segment_data/RG197.SERVSEG.Y70.ebc" --outputfolder "../../tests/test_data/service_segment_data/output" --layoutfile "../../tests/layout_repository/service_segment_data.json"
+
+echo %ERRORLEVEL%
 ```
 
 * Output location: ./tests/test_data/service_segment_data/output
@@ -241,6 +254,8 @@ convert.py --inputfile "../../tests/test_data/service_segment_data/RG197.SERVSEG
 
 ```bash
 python -m ebcdic_parser --inputfile "D:\Projects\ebcdic-parser\tests\test_data\311_calls_for_service_requests_all_strings\311_calls_for_service_requests_sample.dat" --outputfolder "D:\Projects\test_project" --layoutfile "D:\Projects\ebcdic-parser\tests\layout_repository\311_calls_for_service_requests_all_strings.json"  --outputdelimiter "," --logfolder "D:\Projects\test_project\log"
+
+echo %ERRORLEVEL%
 ```
 
 ## Testing
