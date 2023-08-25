@@ -1,5 +1,9 @@
 # Release Notes
 
+## Release 3.3.0
+* Return output to default device after completion.
+* Modified run() to pass returnCode to main() and as the final exit code. 
+
 ## Release 3.2.2
 * Automate version management.
 * Add CHANGES.md documentation.
