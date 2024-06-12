@@ -60,7 +60,7 @@ Detailed information about conversion rules setup file can be found in [Engine R
             "layouttype": "main",
             "layout": [
                 {
-                    "name": "employee_name", "type": "string", "size": 55
+                    "name": "employee_name", "type": "string", "size": 55, "flunkif": "testaccountname",
                 },
                 {
                     "name": "wages", "type": "packedDecimal", "size": 8
@@ -112,7 +112,8 @@ returnCode=run(inputFile,
                groupRecordsLevel2=False,
                verbose=True,
                debug=False,
-               cliMode=False)
+               cliMode=False,
+               stripDelimiterValues=False)
 ```
 
 
@@ -130,7 +131,7 @@ returnCode=run(inputFile,
 * **verbose** - show extended information on screen. Optional parameter. Default value is `True`.
 * **debug** - show debug information. Optional parameter. Default value is `False`.
 * **cliMode** - a flag how it run in command prompt or Pip installation.  
-
+* **stripDelimiterValues** - remove any delimiter (outputdelimiter) and carrige return\newline characters found in string type field values
 * **returnCode** - exit codes: 0 - successful completion, 1 - completion with any error
 
 
