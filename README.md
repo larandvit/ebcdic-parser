@@ -63,7 +63,7 @@ Detailed information about conversion rules setup file can be found in [Engine R
                     "name": "employee_name", "type": "string", "size": 55,
                 },
                 {
-                    "name": "employee_type", "type": "string", "size": 55, "flunkif":"c,x,p"
+                    "name": "employee_type", "type": "string", "size": 1, "flunkif":"c,x,p"
                 },
                 {
                     "name": "wages", "type": "packedDecimal", "size": 8
