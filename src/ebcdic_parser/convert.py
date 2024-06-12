@@ -804,7 +804,7 @@ def run(inputFile,
                         try: 
                             fieldValue = str(dataConverter.convert(record[fieldStart:fieldEnd], field))
 
-                            if stripDelimiterValues==True:
+                            if stripDelimiterValues==True and fieldType=="string":
                                 # clean up the field value by removing the delimter and and cr or linefeeds in the data
                                 fieldValue = fieldValue.replace(delimiter,'')
                                 fieldValue = fieldValue.replace('\r', '')
@@ -812,7 +812,8 @@ def run(inputFile,
 
                             recordBuf = recordBuf + delimiter + fieldValue
                             # don't extract record if value matches flunkif criteria
-                            if flunkif:
+                            # TODO - add the ability to flunk numeric values, ranges and regex comparisons
+                            if flunkif and fieldType=="string":
                                 flunkarray = flunkif.split(",")
                                 if fieldValue.rstrip() in flunkarray:
                                     skiprecord=True
