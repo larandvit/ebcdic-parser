@@ -94,6 +94,8 @@ LAYOUTELEMENT_FOOTER = "footer"
 LAYOUTELEMENT_NAME = "name"
 LAYOUTELEMENT_TYPE = "type"
 LAYOUTELEMENT_SIZE = "size"
+LAYOUTELEMENT_FLUNKIF = "flunkif"
+
 LAYOUTELEMENT_SCALE = "scale"
 LAYOUTELEMENT_KEYTYPE = "keytype"
 
@@ -101,7 +103,7 @@ LAYOUTVALUE_KEYTYPE_LAYOUTTYPE = "layouttype"
 LAYOUTVALUE_KEYTYPE_LAYOUTSIZE = "layoutsize"
 LAYOUTVALUE_KEYTYPE_VARIABLEREPEATTIMES = "variablerepeattimes"
 
-LAYOUTLIST_FIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SIZE, LAYOUTELEMENT_SCALE]
+LAYOUTLIST_FIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SIZE,LAYOUTELEMENT_FLUNKIF, LAYOUTELEMENT_SCALE]
 LAYOUTLIST_KEYFIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SIZE, LAYOUTELEMENT_SCALE, LAYOUTELEMENT_KEYTYPE]
 
 FILEFORMATS = {FileFormat.SingleSchema:"Single schema",
@@ -206,6 +208,7 @@ class LayoutDefinition():
                         for elementName in LAYOUTLIST_FIELDS:
                             if elementName in field:
                                 setattr(self.header, elementName, field[elementName])
+                                print(elementName)
                             else:
                                 if elementName not in [LAYOUTELEMENT_SCALE]:
                                     self.errorDescription = "'" + elementName + "' element field is not found: " + str(field)
@@ -246,7 +249,7 @@ class LayoutDefinition():
                             if elementName in keyField:
                                 setattr(layoutKeyField, elementName, keyField[elementName])
                             else:
-                                if elementName not in [LAYOUTELEMENT_SCALE, LAYOUTELEMENT_KEYTYPE]:
+                                if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF, LAYOUTELEMENT_KEYTYPE]:
                                     self.errorDescription = "Key fileds: '" + elementName + "' element is not found: " + str(keyField)
                                     return not self.isError
 
@@ -323,7 +326,7 @@ class LayoutDefinition():
                             if elementName in field:
                                 setattr(layoutField, elementName, field[elementName])
                             else:
-                                if elementName not in [LAYOUTELEMENT_SCALE]:
+                                if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF]:
                                     self.errorDescription = "Fileds: '" + elementName + "' element is not found: " + str(field)
                                     return not self.isError
                            
@@ -357,7 +360,7 @@ class LayoutDefinition():
                                 if elementName in field:
                                     setattr(variableLayoutField, elementName, field[elementName])
                                 else:
-                                    if elementName not in [LAYOUTELEMENT_SCALE]:
+                                    if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF]:
                                         self.errorDescription = "Variable fileds: '" + elementName + "' element is not found: " + str(field)
                                         return not self.isError
                                 
@@ -562,7 +565,8 @@ def run(inputFile,
         groupRecordsLevel2=GROUPRECORDSLEVEL2,
         verbose=VERBOSE,
         debug=DEBUG_MODE,
-        cliMode=False):
+        cliMode=False,
+        stripDelimiterValues=False):
     
     returnCode = 1
     
@@ -670,6 +674,8 @@ def run(inputFile,
             unqKey = None
             if layoutDefinition.isVariableFields:
                 unqKey = uuid.uuid4().hex
+
+            flunkedrecords = 0
             
             while recordSizeBytes:
                 
@@ -741,6 +747,7 @@ def run(inputFile,
                 delimiter=""
                 
                 # read record data
+                
                 record = None
                 if(layoutDefinition.isMultipleLayouts):
                     if(foundLayout.isVariableFields and layoutDefinition.isKeyLayoutSize):
@@ -768,6 +775,7 @@ def run(inputFile,
                 lastField = None
                 currentRecordPosition = 0
                 
+
                 if layoutDefinition.isMultipleLayouts and GROUPRECORDS:
                     if(str(layoutDefinition.layouts[0].layoutType).strip()==str(foundLayout.layoutType)):
                         relatedGroup = uuid.uuid4().hex
@@ -781,22 +789,35 @@ def run(inputFile,
                             print('Generated related group level 2: {}. Number of bytes read: {}'.format(relatedGroupLevel2, NumberOfRecordsRead))
                 
                 recordBuf = ""
-                
+                skiprecord=False
                 for field in foundLayout.fields:
                     fieldName = field.name
                     fieldType = field.type
                     fieldSize = field.size
                     fieldStart = field.start
+                    flunkif = field.flunkif if hasattr(field, 'flunkif') else None
                     fieldEnd= fieldStart + fieldSize
-                    
                     if DEBUG_MODE:
                         print('Field name: {}. Number of bytes read: {}'.format(fieldName, NumberOfRecordsRead))
-                        
                     # don't extract field value if field type is "skip"
                     if(fieldType!=SKIPFIELDTYPENAME):
                         try: 
                             fieldValue = str(dataConverter.convert(record[fieldStart:fieldEnd], field))
+
+                            if stripDelimiterValues==True:
+                                # clean up the field value by removing the delimter and and cr or linefeeds in the data
+                                fieldValue = fieldValue.replace(delimiter,'')
+                                fieldValue = fieldValue.replace('\r', '')
+                                fieldValue = fieldValue.replace('\n', '')
+
                             recordBuf = recordBuf + delimiter + fieldValue
+                            # don't extract record if value matches flunkif criteria
+                            if flunkif:
+                                flunkarray = flunkif.split(",")
+                                if fieldValue.rstrip() in flunkarray:
+                                    skiprecord=True
+                                    flunkedrecords = flunkedrecords + 1
+                                    #continue
                             if DEBUG_MODE:
                                 print('Field value: {}. Number of bytes read: {}. Record buffer: {}'.format(fieldValue, NumberOfRecordsRead, recordBuf))
                         except UnicodeEncodeError as ex:
@@ -848,11 +869,15 @@ def run(inputFile,
                     if DEBUG_MODE:
                         print('Unique key to link variable records: {}. Number of bytes read: {}. Record buffer: {}'.format(unqKey, NumberOfRecordsRead, recordBuf))
                 
-                recordBuf = recordBuf + NEWLINE
-                f_out.write(recordBuf)
+                if skiprecord==False:
+                    recordBuf = recordBuf + NEWLINE
+                    f_out.write(recordBuf)
+                    
+
                 if DEBUG_MODE:
                     print('Record written. Number of bytes read: {}'.format(NumberOfRecordsRead))
-    
+                    
+
                 if(foundLayout.isVariableFields):
                     outputVariableFileName = fileName + "_type_" + str(foundLayout.layoutType) + "_variable"
                     outputVariablePath = path.join(outputFolder, outputVariableFileName + OUTPUTFILEEXTENSION)
@@ -995,7 +1020,7 @@ def run(inputFile,
                     if DEBUG_MODE:
                         print('Single schema. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(layoutSize, NumberOfRecordsRead, show_bytes(recordSizeBytes)))
                 
-        print()            
+        print('Records fluked: ', flunkedrecords)
         keys = sorted(recordCount.keys())
         for key in keys:
             print(str(key) + ": " +  str(recordCount[key]))
@@ -1143,7 +1168,8 @@ def main():
                          GROUPRECORDSLEVEL2,
                          VERBOSE,
                          DEBUG_MODE,
-                         cliMode=True)
+                         cliMode=True,
+                         stripDelimiterValues=False)
          
     except KnownIssue as descr:
         print(descr)
