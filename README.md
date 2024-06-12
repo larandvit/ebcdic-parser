@@ -134,7 +134,7 @@ returnCode=run(inputFile,
 * **verbose** - show extended information on screen. Optional parameter. Default value is `True`.
 * **debug** - show debug information. Optional parameter. Default value is `False`.
 * **cliMode** - a flag how it run in command prompt or Pip installation.  
-* **stripDelimiterValues** - remove any delimiter (outputdelimiter) and carrige return\newline characters found in string type field values
+* **stripDelimiterValues** - remove any delimiter (outputdelimiter) and carrige return\newline characters found in string type field values. Optional parameter. Default value is `False`.
 * **returnCode** - exit codes: 0 - successful completion, 1 - completion with any error
 
 
