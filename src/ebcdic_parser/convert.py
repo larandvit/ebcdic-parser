@@ -57,7 +57,7 @@ class ParameterDefaults:
     GROUPRECORDS = False
     GROUPRECORDSLEVEL2 = False
     DEBUG_MODE = False
-
+    STRIP_DELIMITER_VALUES = False
     PYTHONENCODING = True
     INPUTENCODING = "cp037"
     OUTPUTENCODING = "utf_8"
@@ -74,6 +74,7 @@ VERBOSE = ParameterDefaults.VERBOSE
 GROUPRECORDS = ParameterDefaults.GROUPRECORDS
 GROUPRECORDSLEVEL2 = ParameterDefaults.GROUPRECORDSLEVEL2
 DEBUG_MODE = ParameterDefaults.DEBUG_MODE
+STRIP_DELIMITER_VALUES = ParameterDefaults.STRIP_DELIMITER_VALUES
 
 PYTHONENCODING = ParameterDefaults.PYTHONENCODING
 INPUTENCODING = ParameterDefaults.INPUTENCODING
@@ -95,7 +96,7 @@ LAYOUTELEMENT_NAME = "name"
 LAYOUTELEMENT_TYPE = "type"
 LAYOUTELEMENT_SIZE = "size"
 LAYOUTELEMENT_FLUNKIF = "flunkif"
-
+LAYOUTELEMENT_INCLUDEIF = "includeif"
 LAYOUTELEMENT_SCALE = "scale"
 LAYOUTELEMENT_KEYTYPE = "keytype"
 
@@ -103,7 +104,7 @@ LAYOUTVALUE_KEYTYPE_LAYOUTTYPE = "layouttype"
 LAYOUTVALUE_KEYTYPE_LAYOUTSIZE = "layoutsize"
 LAYOUTVALUE_KEYTYPE_VARIABLEREPEATTIMES = "variablerepeattimes"
 
-LAYOUTLIST_FIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SIZE,LAYOUTELEMENT_FLUNKIF, LAYOUTELEMENT_SCALE]
+LAYOUTLIST_FIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SIZE,LAYOUTELEMENT_FLUNKIF, LAYOUTELEMENT_INCLUDEIF, LAYOUTELEMENT_SCALE]
 LAYOUTLIST_KEYFIELDS = [LAYOUTELEMENT_NAME, LAYOUTELEMENT_TYPE, LAYOUTELEMENT_SIZE, LAYOUTELEMENT_SCALE, LAYOUTELEMENT_KEYTYPE]
 
 FILEFORMATS = {FileFormat.SingleSchema:"Single schema",
@@ -249,7 +250,7 @@ class LayoutDefinition():
                             if elementName in keyField:
                                 setattr(layoutKeyField, elementName, keyField[elementName])
                             else:
-                                if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF, LAYOUTELEMENT_KEYTYPE]:
+                                if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF,LAYOUTELEMENT_INCLUDEIF, LAYOUTELEMENT_KEYTYPE]:
                                     self.errorDescription = "Key fileds: '" + elementName + "' element is not found: " + str(keyField)
                                     return not self.isError
 
@@ -326,7 +327,7 @@ class LayoutDefinition():
                             if elementName in field:
                                 setattr(layoutField, elementName, field[elementName])
                             else:
-                                if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF]:
+                                if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF,LAYOUTELEMENT_INCLUDEIF]:
                                     self.errorDescription = "Fileds: '" + elementName + "' element is not found: " + str(field)
                                     return not self.isError
                            
@@ -360,7 +361,7 @@ class LayoutDefinition():
                                 if elementName in field:
                                     setattr(variableLayoutField, elementName, field[elementName])
                                 else:
-                                    if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF]:
+                                    if elementName not in [LAYOUTELEMENT_SCALE,LAYOUTELEMENT_FLUNKIF,LAYOUTELEMENT_INCLUDEIF]:
                                         self.errorDescription = "Variable fileds: '" + elementName + "' element is not found: " + str(field)
                                         return not self.isError
                                 
@@ -796,6 +797,8 @@ def run(inputFile,
                     fieldSize = field.size
                     fieldStart = field.start
                     flunkif = field.flunkif if hasattr(field, 'flunkif') else None
+                    flunklike = field.flunklike if hasattr(field, 'flunklike') else None
+                    includeif = field.includeif if hasattr(field, 'includeif') else None
                     fieldEnd= fieldStart + fieldSize
                     if DEBUG_MODE:
                         print('Field name: {}. Number of bytes read: {}'.format(fieldName, NumberOfRecordsRead))
@@ -811,14 +814,24 @@ def run(inputFile,
                                 fieldValue = fieldValue.replace('\n', '')
 
                             recordBuf = recordBuf + delimiter + fieldValue
+
+                            # don't extract record if layoutfield has an includeif value and
+                            # the field value isn't one of the included values
+                            if includeif and fieldType=="string":
+                                includearray = includeif.split(",")
+                                if fieldValue.rstrip() not in includearray:
+                                    skiprecord=True
+                                    flunkedrecords = flunkedrecords + 1
+                                    continue
+
                             # don't extract record if value matches flunkif criteria
-                            # TODO - add the ability to flunk numeric values, ranges and regex comparisons
                             if flunkif and fieldType=="string":
                                 flunkarray = flunkif.split(",")
                                 if fieldValue.rstrip() in flunkarray:
                                     skiprecord=True
                                     flunkedrecords = flunkedrecords + 1
-                                    #continue
+                                    continue
+
                             if DEBUG_MODE:
                                 print('Field value: {}. Number of bytes read: {}. Record buffer: {}'.format(fieldValue, NumberOfRecordsRead, recordBuf))
                         except UnicodeEncodeError as ex:
@@ -873,7 +886,10 @@ def run(inputFile,
                 if skiprecord==False:
                     recordBuf = recordBuf + NEWLINE
                     f_out.write(recordBuf)
-                    
+                else:
+                    if DEBUG_MODE:
+                        print(f"flunif criteria matched: Skipping Record # {NumberOfRecordsRead}")
+                    # TODO add skip record funtionality to variable length record 
 
                 if DEBUG_MODE:
                     print('Record written. Number of bytes read: {}'.format(NumberOfRecordsRead))
@@ -1021,7 +1037,8 @@ def run(inputFile,
                     if DEBUG_MODE:
                         print('Single schema. Record size: {} bytes. Number of bytes read: {}. Source record: {}'.format(layoutSize, NumberOfRecordsRead, show_bytes(recordSizeBytes)))
                 
-        print('Records fluked: ', flunkedrecords)
+        print('Records flunked: ', flunkedrecords)
+        
         keys = sorted(recordCount.keys())
         for key in keys:
             print(str(key) + ": " +  str(recordCount[key]))
@@ -1100,7 +1117,8 @@ def main():
         parser.add_argument("--grouprecordslevel2", nargs="?", default="yes" if ParameterDefaults.GROUPRECORDSLEVEL2 else "no", choices=["yes","no"], help="create relationships between records for level 2", metavar='yes/no')
         parser.add_argument("--verbose", nargs="?", default="yes" if ParameterDefaults.VERBOSE else "no", choices=["yes","no"], help="show information on screen", metavar='yes/no')
         parser.add_argument("--debug", nargs="?", default="yes" if ParameterDefaults.DEBUG_MODE else "no", choices=["yes","no"], help="show debug information", metavar='yes/no')
-    
+        parser.add_argument("--stripdelimitervalues",nargs="?", default="yes" if ParameterDefaults.STRIP_DELIMITER_VALUES else "no", choices=["yes","no"], help="strip delimiter characters from field values", metavar='yes/no')
+
         args = parser.parse_args()
         wrongArgumentsFlag = False
         
@@ -1120,6 +1138,7 @@ def main():
         GROUPRECORDS = True if args.grouprecords=="yes" else False
         GROUPRECORDSLEVEL2 = True if args.grouprecordslevel2=="yes" else False
         VERBOSE = True if args.verbose=="yes" else False
+        STRIP_DELIMITER_VALUES = True if args.stripdelimitervalues=="yes" else False
         DEBUG_MODE = True if args.debug=="yes" else False
         ##############################################################################
         
@@ -1144,6 +1163,7 @@ def main():
         print("Group records level 2: ", "yes" if GROUPRECORDSLEVEL2 else "no")
         print("Show information on screen:", args.verbose)
         print("Show debug information:", args.debug)
+        print("Strip delimiter values:", args.stripdelimitervalues)
         
         # layout definitions and other supplemental info
         layoutDefinition = LayoutDefinition()
@@ -1170,7 +1190,7 @@ def main():
                          VERBOSE,
                          DEBUG_MODE,
                          cliMode=True,
-                         stripDelimiterValues=False)
+                         stripDelimiterValues=STRIP_DELIMITER_VALUES)
          
     except KnownIssue as descr:
         print(descr)
