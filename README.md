@@ -190,6 +190,8 @@ optional arguments:
                         create relationships between records for level 2
   --verbose [yes/no]    show information on screen
   --debug [yes/no]      show debug information
+  --stripdelimitervalues [yes/no]
+                        strip delimiter characters from field values 
 
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```
