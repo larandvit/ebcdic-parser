@@ -60,7 +60,10 @@ Detailed information about conversion rules setup file can be found in [Engine R
             "layouttype": "main",
             "layout": [
                 {
-                    "name": "employee_name", "type": "string", "size": 55
+                    "name": "employee_name", "type": "string", "size": 55,
+                },
+                {
+                    "name": "employee_type", "type": "string", "size": 1, "flunkif":"c,x,p"
                 },
                 {
                     "name": "wages", "type": "packedDecimal", "size": 8
@@ -112,7 +115,8 @@ returnCode=run(inputFile,
                groupRecordsLevel2=False,
                verbose=True,
                debug=False,
-               cliMode=False)
+               cliMode=False,
+               stripDelimiterValues=False)
 ```
 
 
@@ -130,7 +134,7 @@ returnCode=run(inputFile,
 * **verbose** - show extended information on screen. Optional parameter. Default value is `True`.
 * **debug** - show debug information. Optional parameter. Default value is `False`.
 * **cliMode** - a flag how it run in command prompt or Pip installation.  
-
+* **stripDelimiterValues** - remove any delimiter (outputdelimiter) and carrige return\newline characters found in string type field values. Optional parameter. Default value is `False`.
 * **returnCode** - exit codes: 0 - successful completion, 1 - completion with any error
 
 
@@ -186,6 +190,8 @@ optional arguments:
                         create relationships between records for level 2
   --verbose [yes/no]    show information on screen
   --debug [yes/no]      show debug information
+  --stripdelimitervalues [yes/no]
+                        strip delimiter characters from field values 
 
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```

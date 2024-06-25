@@ -101,6 +101,9 @@ There is a special type - *laypouttypeconditional*. It's used to separate record
                 {
                     "name": "employee_name", "type": "string", "size": 55
                 },
+                {   
+                    "name": "employee_type", "type": "string", "size": 1, "flunkif":"p,x,c"
+                },
                 {
                     "name": "wages", "type": "packedDecimal", "size": 8
                 },
@@ -131,6 +134,9 @@ Full [field size](https://github.com/larandvit/ebcdic-parser/blob/master/docs/co
 
 ### scale
 [Size of decimals](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md).
+
+### flunkif
+An optional comma seperated value list to exclude from final output for the given field. Currently applies to string values only. 
 
 ### keytype
 The values is variablerepeattimes. It's a flag which shows a field with number of variable records. The field is optional one.
