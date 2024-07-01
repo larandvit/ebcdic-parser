@@ -39,6 +39,10 @@ Conversion rules are a driver to parse EBCDIC data.
   1. Pip package 
   2. Command prompt
   3. python -m ebcdic_parser
+  
+* Exclude data from final output for a given field based on conditions.
+
+* Remove a delimiter, carriage return and newline characters from final output for string fields.
 
 ## Conversion rules sample
 Detailed information about conversion rules setup file can be found in [Engine Rules](https://github.com/larandvit/ebcdic-parser/blob/master/docs/engine_rules_manual.md) manual. [COBOL Engine Rules Dictionary](https://github.com/larandvit/ebcdic-parser/blob/master/docs/cobol_engine_rules_dictionary.md) manual describes how to convert COBOL data types into engine rules layout.
@@ -134,7 +138,7 @@ returnCode=run(inputFile,
 * **verbose** - show extended information on screen. Optional parameter. Default value is `True`.
 * **debug** - show debug information. Optional parameter. Default value is `False`.
 * **cliMode** - a flag how it run in command prompt or Pip installation.  
-* **stripDelimiterValues** - remove any delimiter (outputdelimiter) and carrige return\newline characters found in string type field values. Optional parameter. Default value is `False`.
+* **stripDelimiterValues** - remove any delimiter (outputdelimiter) and carriage return\newline characters found in string type field values. Optional parameter. Default value is `False`.
 * **returnCode** - exit codes: 0 - successful completion, 1 - completion with any error
 
 

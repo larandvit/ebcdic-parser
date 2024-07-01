@@ -33,6 +33,10 @@ A Python application is aimed to convert mainframe EBCDIC data into Unicode ASCI
   1. Pip package 
   2. Command prompt
   3. python -m ebcdic_parser
+  
+* Exclude data from final output for a given field based on conditions.
+
+* Remove a delimiter, carriage return and newline characters from final output for string fields.
 
 ## Pip Usage
 
@@ -90,7 +94,7 @@ returnCode=run(inputFile,
 * **verbose** - show extended information on screen. Optional parameter. Default value is `True`.
 * **debug** - show debug information. Optional parameter. Default value is `False`.
 * **cliMode** - a flag how it run in command prompt or Pip installation.
-
+* **stripDelimiterValues** - remove any delimiter (outputdelimiter) and carriage return\newline characters found in string type field values. Optional parameter. Default value is `False`.
 * **returnCode** - exit codes: 0 - successful completion, 1 - completion with any error
 
 ## python -m ebcdic_parser Usage
@@ -142,6 +146,8 @@ Arguments:
                         create relationships between records for level 2
   --verbose [yes/no]    show information on screen
   --debug [yes/no]      show debug information
+  --stripdelimitervalues [yes/no]
+                        strip delimiter characters from field values
 
 Exit codes: 0 - successful completion, 1 - completion with any error
 ```

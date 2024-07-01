@@ -1,5 +1,9 @@
 # Release Notes
 
+## Release 3.4.0
+* Exclude data from final output for a given field based on conditions.
+* Remove a delimiter, carriage return and newline characters from final output for string fields.
+
 ## Release 3.3.0
 * Return output to default device after completion.
 * Modified run() to pass returnCode to main() and as the final exit code. 
